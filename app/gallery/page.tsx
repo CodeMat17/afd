@@ -5,7 +5,7 @@ import { catalog } from "@/lib/repository";
 
 export const metadata: Metadata = {
   title: "Gallery",
-  description: "Ankara, Kente, Isiagu and beaded lace up close — photographed in our Nairobi showroom.",
+  description: "Gowns, kaftans and matching looks made with our Ankara, Isiagu, lace and sequin fabrics.",
   alternates: { canonical: "/gallery" },
 };
 
@@ -20,7 +20,7 @@ export default async function GalleryPage() {
             Through <em className="text-primary">the lens</em>
           </>
         }
-        description="Texture, sheen and scale, photographed in the showroom. Tap any image to view it full screen."
+        description="Gowns, kaftans and matching looks made with our fabrics. Tap any image to view it full screen."
       />
       <Container className="py-12 lg:py-16">
         <GalleryGrid images={images} />

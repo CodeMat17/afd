@@ -15,6 +15,7 @@ export interface LightboxImage {
 
 const SWIPE_DISTANCE = 60;
 const SWIPE_VELOCITY = 400;
+const MAX_UPSCALE = 2;
 
 /**
  * Accessible modal lightbox built on native <dialog>: focus is contained,
@@ -131,17 +132,26 @@ export function Lightbox({
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.6}
                 onDragEnd={onDragEnd}
-                className="relative h-full w-full touch-pan-y"
+                className="flex h-full w-full touch-pan-y items-center justify-center"
               >
-                <Image
-                  src={current.src}
-                  alt={current.alt}
-                  fill
-                  quality={90}
-                  sizes="100vw"
-                  draggable={false}
-                  className="pointer-events-none object-contain select-none"
-                />
+                {/* Never upscale past 2x the source, so small photos stay crisp. */}
+                <div
+                  className="relative max-w-full"
+                  style={{
+                    aspectRatio: `${current.width} / ${current.height}`,
+                    height: `min(100%, ${current.height * MAX_UPSCALE}px)`,
+                  }}
+                >
+                  <Image
+                    src={current.src}
+                    alt={current.alt}
+                    fill
+                    quality={90}
+                    sizes="100vw"
+                    draggable={false}
+                    className="pointer-events-none object-contain select-none"
+                  />
+                </div>
               </motion.div>
             </AnimatePresence>
 

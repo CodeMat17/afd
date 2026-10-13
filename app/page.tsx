@@ -31,7 +31,7 @@ export default async function HomePage() {
     catalog.getCategories(),
     catalog.getProducts(),
     catalog.getFeaturedProducts(8),
-    catalog.getGalleryImages(),
+    catalog.getEditorialImages(),
   ]);
 
   const categoryNames = Object.fromEntries(categories.map((c) => [c.id, c.name]));

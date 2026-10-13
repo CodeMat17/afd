@@ -1,6 +1,7 @@
 import "server-only";
 
 import { mockCategories } from "@/lib/data/categories";
+import { mockEditorial } from "@/lib/data/editorial";
 import { mockGallery } from "@/lib/data/gallery";
 import { mockProducts } from "@/lib/data/products";
 import type { CatalogRepository } from "@/lib/repository/types";
@@ -44,5 +45,8 @@ export const mockRepository: CatalogRepository = {
   },
   async getGalleryImages() {
     return mockGallery;
+  },
+  async getEditorialImages() {
+    return mockEditorial;
   },
 };

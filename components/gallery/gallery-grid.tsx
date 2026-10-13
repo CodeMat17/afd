@@ -8,44 +8,72 @@ import { Lightbox } from "@/components/gallery/lightbox";
 import { Reveal } from "@/components/motion/reveal";
 import type { GalleryImage } from "@/lib/types";
 
+const lookNumber = (i: number) => String(i + 1).padStart(2, "0");
+
+/**
+ * Lookbook-style masonry. Columns stay narrow (roughly 180–230px) so the
+ * small source photography is never stretched beyond its natural size.
+ */
 export function GalleryGrid({ images }: { images: GalleryImage[] }) {
   const [index, setIndex] = useState<number | null>(null);
 
   return (
     <>
-      <ul className="columns-2 gap-3 sm:gap-5 lg:columns-3 2xl:columns-4">
+      <div className="mb-8 flex items-baseline justify-between gap-4 border-b border-foreground/10 pb-4 sm:mb-10">
+        <p className="eyebrow flex items-center gap-3 text-gold">
+          <span className="h-px w-8 bg-current" aria-hidden="true" />
+          The lookbook
+        </p>
+        <p className="font-heading text-sm text-muted-foreground italic tabular-nums">
+          {images.length} looks
+        </p>
+      </div>
+
+      <ul className="columns-2 gap-3 sm:columns-3 sm:gap-4 md:columns-4 lg:columns-5 lg:gap-5 xl:columns-6">
         {images.map((image, i) => (
-          <li key={image.id} className="mb-3 break-inside-avoid sm:mb-5">
-            <Reveal delay={(i % 3) * 0.08}>
+          <li key={image.id} className="mb-6 break-inside-avoid sm:mb-8">
+            <Reveal delay={(i % 4) * 0.06}>
               <figure className="group">
                 <button
                   type="button"
                   onClick={() => setIndex(i)}
-                  aria-label={`Open image: ${image.caption}`}
-                  className="relative block w-full cursor-zoom-in overflow-hidden rounded-sm bg-muted"
+                  aria-label={`Open look ${lookNumber(i)}: ${image.caption}`}
+                  className="relative block w-full cursor-zoom-in overflow-hidden rounded-sm bg-muted shadow-[0_6px_16px_-6px] shadow-ink/35 ring-1 ring-foreground/5 transition-[translate,box-shadow] duration-500 ease-silk group-hover:-translate-y-1 group-hover:shadow-[0_18px_36px_-10px] group-hover:shadow-ink/50 dark:shadow-ink/80 dark:group-hover:shadow-ink"
                   style={{ aspectRatio: `${image.width} / ${image.height}` }}
                 >
                   <Image
                     src={image.imageUrl}
                     alt={image.altText}
                     fill
-                    preload={i < 2}
-                    sizes="(min-width: 1536px) 24vw, (min-width: 1024px) 32vw, 48vw"
-                    className="object-cover transition-transform duration-[1.4s] ease-silk group-hover:scale-105"
+                    preload={i < 4}
+                    sizes="(min-width: 1280px) 15vw, (min-width: 1024px) 18vw, (min-width: 768px) 23vw, (min-width: 640px) 31vw, 47vw"
+                    className="object-cover transition-transform duration-[1.4s] ease-silk group-hover:scale-[1.04]"
                   />
-                  <span className="absolute inset-0 bg-ink/0 transition-colors duration-500 group-hover:bg-ink/25" />
-                  <span className="absolute top-3 right-3 flex size-10 items-center justify-center rounded-full bg-background/90 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
-                    <Expand className="size-4" aria-hidden="true" />
+                  <span
+                    className="absolute inset-0 bg-linear-to-t from-ink/70 via-ink/0 to-ink/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-focus-visible:opacity-100"
+                    aria-hidden="true"
+                  />
+                  <span
+                    className="absolute bottom-2.5 left-3 flex items-center gap-1.5 text-[11px] font-semibold tracking-[0.18em] text-ink-foreground uppercase opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:opacity-100 sm:translate-y-1"
+                    aria-hidden="true"
+                  >
+                    <Expand className="size-3" />
+                    View
                   </span>
                 </button>
-                <figcaption className="mt-2.5 flex items-baseline justify-between gap-3">
-                  <span className="font-heading text-base italic sm:text-lg">{image.caption}</span>
+                <figcaption className="mt-2.5">
+                  <span className="block text-[10px] font-semibold tracking-[0.22em] text-gold uppercase tabular-nums">
+                    Look {lookNumber(i)}
+                  </span>
+                  <span className="mt-0.5 block font-heading text-sm leading-snug italic sm:text-[0.95rem]">
+                    {image.caption}
+                  </span>
                   {image.productSlug ? (
                     <Link
                       href={`/products/${image.productSlug}`}
-                      className="inline-flex min-h-10 shrink-0 items-center text-xs font-semibold underline decoration-foreground/30 underline-offset-4 hover:decoration-primary"
+                      className="mt-1 inline-flex min-h-8 items-center text-xs font-semibold underline decoration-foreground/30 underline-offset-4 hover:decoration-primary"
                     >
-                      Shop<span className="sr-only">: {image.caption}</span>
+                      Shop the fabric<span className="sr-only">: {image.caption}</span>
                     </Link>
                   ) : null}
                 </figcaption>
@@ -56,12 +84,12 @@ export function GalleryGrid({ images }: { images: GalleryImage[] }) {
       </ul>
 
       <Lightbox
-        images={images.map((img) => ({
+        images={images.map((img, i) => ({
           src: img.imageUrl,
           alt: img.altText,
           width: img.width,
           height: img.height,
-          caption: img.caption,
+          caption: `Look ${lookNumber(i)} · ${img.caption}`,
         }))}
         index={index}
         onIndexChange={setIndex}

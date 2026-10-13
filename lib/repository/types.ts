@@ -21,6 +21,8 @@ export interface CategoryRepository {
 
 export interface GalleryRepository {
   getGalleryImages(): Promise<GalleryImage[]>;
+  /** Large-format imagery for the home page editorial sections. */
+  getEditorialImages(): Promise<GalleryImage[]>;
 }
 
 export type CatalogRepository = ProductRepository &

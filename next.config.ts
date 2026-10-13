@@ -1,9 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  images: {
+    // Supplied assets live in /public. Only allow those paths to be optimised.
+    localPatterns: [
+      { pathname: "/images/**", search: "" },
+      { pathname: "/logo.png", search: "" },
+    ],
+    qualities: [75, 90],
+  },
   turbopack: {
     rules: {
       "*.css": {

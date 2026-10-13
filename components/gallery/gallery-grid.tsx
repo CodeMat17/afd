@@ -11,8 +11,8 @@ import type { GalleryImage } from "@/lib/types";
 const lookNumber = (i: number) => String(i + 1).padStart(2, "0");
 
 /**
- * Lookbook-style masonry. Columns stay narrow (roughly 180–230px) so the
- * small source photography is never stretched beyond its natural size.
+ * Lookbook-style masonry. Columns stay narrow (roughly 250–330px) so the
+ * small source photography is only lightly upscaled.
  */
 export function GalleryGrid({ images }: { images: GalleryImage[] }) {
   const [index, setIndex] = useState<number | null>(null);
@@ -29,7 +29,7 @@ export function GalleryGrid({ images }: { images: GalleryImage[] }) {
         </p>
       </div>
 
-      <ul className="columns-2 gap-3 sm:columns-3 sm:gap-4 md:columns-4 lg:columns-5 lg:gap-5 xl:columns-6">
+      <ul className="columns-2 gap-3 sm:columns-3 sm:gap-5 lg:columns-4 lg:gap-6 2xl:columns-5">
         {images.map((image, i) => (
           <li key={image.id} className="mb-6 break-inside-avoid sm:mb-8">
             <Reveal delay={(i % 4) * 0.06}>
@@ -46,7 +46,7 @@ export function GalleryGrid({ images }: { images: GalleryImage[] }) {
                     alt={image.altText}
                     fill
                     preload={i < 4}
-                    sizes="(min-width: 1280px) 15vw, (min-width: 1024px) 18vw, (min-width: 768px) 23vw, (min-width: 640px) 31vw, 47vw"
+                    sizes="(min-width: 1536px) 19vw, (min-width: 1024px) 23vw, (min-width: 640px) 31vw, 47vw"
                     className="object-cover transition-transform duration-[1.4s] ease-silk group-hover:scale-[1.04]"
                   />
                   <span

@@ -26,7 +26,7 @@ export default function OrderDetailPage({
       </PreviewNotice>
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         {["Items", "Delivery address", "Status", "Payment"].map((title) => (
-          <div key={title} className="rounded-md border border-dashed p-5">
+          <div key={title} className="rounded-2xl border border-dashed p-5">
             <p className="text-xs font-semibold tracking-[0.12em] uppercase">{title}</p>
             <p className="mt-2 text-sm text-muted-foreground">Not available in preview.</p>
           </div>

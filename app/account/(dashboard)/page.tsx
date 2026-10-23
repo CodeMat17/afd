@@ -15,7 +15,7 @@ const features = [
 export default function AccountPage() {
   return (
     <div className="space-y-8">
-      <div className="rounded-md border bg-surface p-6 sm:p-8">
+      <div className="rounded-2xl border bg-surface p-6 sm:p-8">
         <h2 className="font-heading text-4xl">You&apos;re not signed in</h2>
         <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted-foreground">
           Sign in to see your orders and saved details. Your cart is kept on this device either way.
@@ -34,7 +34,7 @@ export default function AccountPage() {
         <h2 className="text-xs font-semibold tracking-[0.12em] uppercase">What your account will include</h2>
         <ul className="mt-4 grid gap-4 sm:grid-cols-3">
           {features.map(({ icon: Icon, title, body }) => (
-            <li key={title} className="rounded-md border p-5">
+            <li key={title} className="rounded-2xl border p-5">
               <Icon className="size-5 text-primary" aria-hidden="true" />
               <p className="mt-4 font-semibold">{title}</p>
               <p className="mt-1 text-sm text-muted-foreground">{body}</p>

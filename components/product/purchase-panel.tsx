@@ -34,7 +34,7 @@ export function PurchasePanel({ product }: { product: Product }) {
         </div>
         <div className="text-right">
           <p className="text-xs text-muted-foreground">Line total</p>
-          <p className="text-lg font-semibold tabular-nums" aria-live="polite">
+          <p className="font-heading text-2xl leading-none font-medium tabular-nums lining-nums" aria-live="polite">
             {formatCents(lineTotalCents(product.price, quantity))}
           </p>
         </div>

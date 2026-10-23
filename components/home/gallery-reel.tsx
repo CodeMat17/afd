@@ -87,7 +87,7 @@ export function GalleryReel({ images }: { images: GalleryImage[] }) {
             >
               <Link
                 href={image.productSlug ? `/products/${image.productSlug}` : "/gallery"}
-                className="block overflow-hidden rounded-sm"
+                className="block overflow-hidden rounded-xl"
               >
                 <div className="relative aspect-17/23">
                   <Image
@@ -110,7 +110,7 @@ export function GalleryReel({ images }: { images: GalleryImage[] }) {
 
           <Link
             href="/gallery"
-            className="group flex aspect-17/23 w-[64vw] shrink-0 snap-start flex-col items-center justify-center gap-4 rounded-sm border border-band-foreground/20 text-center transition-colors hover:border-gold sm:w-[18rem] lg:w-[20rem]"
+            className="group flex aspect-17/23 w-[64vw] shrink-0 snap-start flex-col items-center justify-center gap-4 rounded-xl border border-band-foreground/20 text-center transition-colors hover:border-gold sm:w-[18rem] lg:w-[20rem]"
           >
             <span className="flex size-16 items-center justify-center rounded-full border border-band-foreground/30 transition-all duration-500 group-hover:border-gold group-hover:bg-gold group-hover:text-band">
               <ArrowRight className="size-5" aria-hidden="true" />

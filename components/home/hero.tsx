@@ -73,7 +73,7 @@ export function Hero({
       {/* Ambient light */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-1/3 -left-1/4 -z-10 size-[60rem] rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--gold)_16%,transparent),transparent)] blur-2xl"
+        className="pointer-events-none absolute -top-1/3 -left-1/4 -z-10 size-240 rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--gold)_16%,transparent),transparent)] blur-2xl"
       />
 
       {/* Large screens: exactly one viewport tall, so the whole hero is visible without scrolling. */}
@@ -147,7 +147,7 @@ export function Hero({
                 <dt className="text-[0.625rem] font-semibold tracking-[0.2em] text-band-muted uppercase sm:text-[0.6875rem]">
                   {fact.label}
                 </dt>
-                <dd className="font-heading text-2xl leading-none tabular-nums sm:text-3xl">{fact.value}</dd>
+                <dd className="font-heading text-2xl leading-none tabular-nums lining-nums sm:text-3xl">{fact.value}</dd>
               </div>
             ))}
           </motion.dl>
@@ -269,7 +269,7 @@ function FabricCaption({ fabrics }: { fabrics: string[] }) {
           ))}
         </div>
       </div>
-      <span className="ml-2 font-heading text-sm text-ink-muted tabular-nums">
+      <span className="ml-2 font-heading text-sm text-ink-muted tabular-nums lining-nums">
         {String(index + 1).padStart(2, "0")} / {String(fabrics.length).padStart(2, "0")}
       </span>
     </motion.div>

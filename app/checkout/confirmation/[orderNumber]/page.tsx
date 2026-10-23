@@ -41,7 +41,7 @@ export default function ConfirmationPage({
 
         <div className="mt-10 grid gap-4 text-left sm:grid-cols-3">
           {["Order details", "Delivery", "Payment"].map((title) => (
-            <div key={title} className="rounded-md border border-dashed p-5">
+            <div key={title} className="rounded-2xl border border-dashed p-5">
               <p className="text-xs font-semibold tracking-[0.12em] uppercase">{title}</p>
               <p className="mt-2 text-sm text-muted-foreground">Shown here after a real order.</p>
             </div>

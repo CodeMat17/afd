@@ -38,7 +38,7 @@ export function Editorial({
     <section ref={ref} aria-labelledby="editorial-title" className="overflow-hidden py-20 sm:py-24 lg:py-36">
       <Container className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
         <div className="relative pb-16 sm:pb-20 lg:pb-0">
-          <div className="relative aspect-17/23 w-[82%] overflow-hidden rounded-sm bg-muted">
+          <div className="relative aspect-17/23 w-[82%] overflow-hidden rounded-xl bg-muted">
             <motion.div style={{ y: yLarge }} className="absolute -inset-y-[10%] inset-x-0">
               <Image
                 src={primary.src}
@@ -51,7 +51,7 @@ export function Editorial({
           </div>
           <motion.div
             style={{ y: ySmall }}
-            className="absolute right-0 bottom-0 aspect-17/23 w-[46%] overflow-hidden rounded-sm border-[6px] border-background bg-muted shadow-[0_30px_60px_-30px_rgb(31_26_22/0.6)]"
+            className="absolute right-0 bottom-0 aspect-17/23 w-[46%] overflow-hidden rounded-xl border-[6px] border-background bg-muted shadow-[0_30px_60px_-30px_rgb(31_26_22/0.6)]"
           >
             <Image
               src={secondary.src}

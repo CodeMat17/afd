@@ -37,10 +37,10 @@ export function CartView({ products }: { products: Product[] }) {
       <div className="grid gap-10 lg:grid-cols-[1fr_24rem]" aria-busy="true">
         <div className="space-y-4">
           {[0, 1].map((i) => (
-            <div key={i} className="h-36 animate-pulse rounded-sm bg-muted" />
+            <div key={i} className="h-36 animate-pulse rounded-2xl bg-muted" />
           ))}
         </div>
-        <div className="h-72 animate-pulse rounded-sm bg-muted" />
+        <div className="h-72 animate-pulse rounded-2xl bg-muted" />
       </div>
     );
   }
@@ -100,7 +100,7 @@ export function CartView({ products }: { products: Product[] }) {
                       href={`/products/${line.snapshot.slug}`}
                       tabIndex={-1}
                       aria-hidden="true"
-                      className="relative aspect-17/23 overflow-hidden rounded-xl bg-muted"
+                      className="relative aspect-17/23 overflow-hidden rounded-xl bg-muted ring-1 ring-foreground/5"
                     >
                       {line.snapshot.imageUrl ? (
                         <Image src={line.snapshot.imageUrl} alt="" fill sizes="112px" className="object-cover" />
@@ -168,8 +168,8 @@ export function CartView({ products }: { products: Product[] }) {
       </section>
 
       <aside aria-labelledby="summary-title" className="lg:sticky lg:top-[calc(var(--header-height)+1.5rem)] lg:self-start">
-        <div className="rounded-md border bg-surface p-6">
-          <h2 id="summary-title" className="font-heading text-3xl">
+        <div className="rounded-2xl border bg-surface p-6 shadow-[0_30px_60px_-40px_rgb(31_26_22/0.35)] sm:p-8">
+          <h2 id="summary-title" className="font-heading text-3xl tracking-[-0.01em]">
             Order summary
           </h2>
           <dl className="mt-6 space-y-3 text-sm">
@@ -186,7 +186,7 @@ export function CartView({ products }: { products: Product[] }) {
           </dl>
           <div className="mt-6 flex items-baseline justify-between border-t pt-5">
             <p className="text-sm font-semibold">Estimated total</p>
-            <p className="text-2xl font-semibold tabular-nums">{formatCents(subtotal)}</p>
+            <p className="font-heading text-4xl leading-none font-medium tabular-nums lining-nums">{formatCents(subtotal)}</p>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">USD, before shipping and any applicable taxes.</p>
 

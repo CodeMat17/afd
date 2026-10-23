@@ -38,7 +38,7 @@ export function GalleryGrid({ images }: { images: GalleryImage[] }) {
                   type="button"
                   onClick={() => setIndex(i)}
                   aria-label={`Open look ${lookNumber(i)}: ${image.caption}`}
-                  className="relative block w-full cursor-zoom-in overflow-hidden rounded-sm bg-muted shadow-[0_6px_16px_-6px] shadow-ink/35 ring-1 ring-foreground/5 transition-[translate,box-shadow] duration-500 ease-silk group-hover:-translate-y-1 group-hover:shadow-[0_18px_36px_-10px] group-hover:shadow-ink/50 dark:shadow-ink/80 dark:group-hover:shadow-ink"
+                  className="relative block w-full cursor-zoom-in overflow-hidden rounded-xl bg-muted shadow-[0_6px_16px_-6px] shadow-ink/35 ring-1 ring-foreground/5 transition-[translate,box-shadow] duration-500 ease-silk group-hover:-translate-y-1 group-hover:shadow-[0_18px_36px_-10px] group-hover:shadow-ink/50 dark:shadow-ink/80 dark:group-hover:shadow-ink"
                   style={{ aspectRatio: `${image.width} / ${image.height}` }}
                 >
                   <Image

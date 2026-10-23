@@ -24,7 +24,7 @@ export function ProductGallery({ images, name }: { images: ProductImage[]; name:
         type="button"
         onClick={() => setLightboxIndex(active)}
         aria-label={`Open full-screen view of ${name}`}
-        className="group relative block w-full cursor-zoom-in overflow-hidden rounded-2xl bg-muted"
+        className="group relative block w-full cursor-zoom-in overflow-hidden rounded-2xl bg-muted ring-1 ring-foreground/5"
         style={{ aspectRatio: `${current.width} / ${current.height}` }}
       >
         <AnimatePresence initial={false} mode="popLayout">
@@ -47,7 +47,7 @@ export function ProductGallery({ images, name }: { images: ProductImage[]; name:
             />
           </motion.div>
         </AnimatePresence>
-        <span className="absolute right-4 bottom-4 flex h-10 items-center gap-2 rounded-full bg-background/95 px-4 text-xs font-semibold opacity-90 shadow-sm transition-opacity group-hover:opacity-100">
+        <span className="absolute right-4 bottom-4 flex h-10 items-center gap-2 rounded-full border border-white/20 bg-background/75 px-4 text-xs font-semibold opacity-90 shadow-[0_10px_30px_-12px_rgb(15_12_10/0.5)] backdrop-blur-xl transition-opacity group-hover:opacity-100">
           <Expand className="size-3.5" aria-hidden="true" />
           View full screen
         </span>
@@ -63,8 +63,8 @@ export function ProductGallery({ images, name }: { images: ProductImage[]; name:
                 aria-label={`Show image ${i + 1} of ${sorted.length}`}
                 aria-pressed={i === active}
                 className={cn(
-                  "relative block aspect-17/23 w-full overflow-hidden rounded-lg bg-muted ring-offset-2 ring-offset-background transition-all",
-                  i === active ? "ring-2 ring-foreground" : "opacity-70 hover:opacity-100",
+                  "relative block aspect-17/23 w-full overflow-hidden rounded-xl bg-muted ring-offset-2 ring-offset-background transition-all duration-500 ease-silk",
+                  i === active ? "ring-1 ring-foreground" : "opacity-55 hover:opacity-100",
                 )}
               >
                 <Image src={image.imageUrl} alt="" fill sizes="120px" className="object-cover" />

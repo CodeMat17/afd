@@ -74,7 +74,7 @@ export default async function AboutPage() {
               <li key={c.id}>
                 <Reveal delay={i * 0.06}>
                   <Link href={`/shop/${c.slug}`} className="group block">
-                    <div className="relative aspect-4/5 overflow-hidden rounded-sm bg-muted">
+                    <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-muted">
                       {c.imageUrl ? (
                         <Image
                           src={c.imageUrl}

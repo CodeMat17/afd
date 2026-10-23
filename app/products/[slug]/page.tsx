@@ -72,8 +72,13 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
 
           <div className="lg:py-4">
             <Reveal>
-              {category ? <p className="eyebrow text-primary">{category.name}</p> : null}
-              <h1 className="mt-3 font-heading text-[2.75rem] leading-[0.95] font-medium tracking-tight text-balance sm:text-6xl">
+              {category ? (
+                <p className="eyebrow flex items-center gap-3 text-primary">
+                  <span className="h-px w-10 bg-current opacity-60" aria-hidden="true" />
+                  {category.name}
+                </p>
+              ) : null}
+              <h1 className="mt-5 font-heading text-[2.75rem] leading-[0.92] font-medium tracking-[-0.02em] text-balance sm:text-6xl xl:text-[4.25rem]">
                 {product.name}
               </h1>
               <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
@@ -113,7 +118,10 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
               ) : null}
             </Reveal>
 
-            <Reveal delay={0.15} className="mt-8 border-y py-8">
+            <Reveal
+              delay={0.15}
+              className="mt-10 rounded-2xl border bg-surface p-5 shadow-[0_30px_60px_-40px_rgb(31_26_22/0.35)] sm:p-7"
+            >
               <PurchasePanel product={product} />
             </Reveal>
 
@@ -150,12 +158,12 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
 
 function Availability({ available }: { available: boolean }) {
   return available ? (
-    <p className="inline-flex items-center gap-1.5 text-sm font-medium text-olive">
-      <Check className="size-4" aria-hidden="true" />
+    <p className="inline-flex h-8 items-center gap-1.5 rounded-full bg-olive/10 px-3 text-xs font-semibold tracking-wide text-olive dark:bg-secondary/15 dark:text-secondary">
+      <Check className="size-3.5" aria-hidden="true" />
       Available
     </p>
   ) : (
-    <p className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+    <p className="inline-flex h-8 items-center gap-1.5 rounded-full bg-muted px-3 text-xs font-semibold tracking-wide text-muted-foreground">
       <Circle className="size-3.5" aria-hidden="true" />
       Sold out
     </p>
@@ -175,7 +183,7 @@ function FabricDetails({ product }: { product: Product }) {
   const missing = !details.material || !details.width || !details.care;
 
   return (
-    <details className="group mt-2 border-b" open>
+    <details className="group mt-8 border-y" open>
       <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between text-xs font-semibold tracking-[0.12em] uppercase [&::-webkit-details-marker]:hidden">
         Fabric details
         <span className="text-lg leading-none transition-transform group-open:rotate-45" aria-hidden="true">

@@ -5,7 +5,7 @@ import { buttonVariants } from "@/components/ui/button";
 export default function NotFound() {
   return (
     <div className="mx-auto grid max-w-360 items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:gap-20 lg:px-10 lg:py-24">
-      <div className="relative mx-auto aspect-17/23 w-full max-w-sm overflow-hidden rounded-sm bg-muted lg:order-2">
+      <div className="relative mx-auto aspect-17/23 w-full max-w-sm overflow-hidden rounded-xl bg-muted lg:order-2">
         <Image
           src="/images/ankara/1000132850-680x920.jpg"
           alt=""

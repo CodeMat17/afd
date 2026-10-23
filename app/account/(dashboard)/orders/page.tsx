@@ -9,7 +9,7 @@ export default function OrdersPage() {
   return (
     <div>
       <h2 className="font-heading text-4xl">Order history</h2>
-      <div className="mt-6 flex flex-col items-center rounded-md border border-dashed px-6 py-16 text-center">
+      <div className="mt-6 flex flex-col items-center rounded-2xl border border-dashed px-6 py-16 text-center">
         <span className="flex size-16 items-center justify-center rounded-full bg-muted">
           <Package className="size-6 text-muted-foreground" aria-hidden="true" />
         </span>

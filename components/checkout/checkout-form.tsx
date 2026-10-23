@@ -67,7 +67,7 @@ export function CheckoutForm({ products }: { products: Product[] }) {
   };
 
   if (!hydrated) {
-    return <div className="h-[40rem] animate-pulse rounded-md bg-muted" aria-busy="true" />;
+    return <div className="h-[40rem] animate-pulse rounded-2xl bg-muted" aria-busy="true" />;
   }
 
   if (lines.length === 0) {
@@ -143,7 +143,7 @@ export function CheckoutForm({ products }: { products: Product[] }) {
           <legend className="font-heading text-3xl">Tax declaration</legend>
           <label
             htmlFor="readyToPayApplicableTaxes"
-            className="flex cursor-pointer gap-4 rounded-md border bg-surface p-4 transition-colors has-checked:border-foreground"
+            className="flex cursor-pointer gap-4 rounded-2xl border bg-surface p-4 transition-colors has-checked:border-foreground"
           >
             <input
               id="readyToPayApplicableTaxes"
@@ -232,7 +232,7 @@ export function CheckoutForm({ products }: { products: Product[] }) {
       </form>
 
       <aside aria-labelledby="checkout-summary" className="lg:sticky lg:top-[calc(var(--header-height)+1.5rem)] lg:self-start">
-        <div className="rounded-md border bg-surface p-6">
+        <div className="rounded-2xl border bg-surface p-6">
           <h2 id="checkout-summary" className="font-heading text-3xl">
             Summary
           </h2>

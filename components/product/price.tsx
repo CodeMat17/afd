@@ -15,8 +15,10 @@ export function Price({
     <p className={cn("flex items-baseline gap-1.5", className)}>
       <span
         className={cn(
-          "font-semibold tabular-nums",
-          size === "lg" ? "text-2xl tracking-tight" : "text-[0.9375rem]",
+          "tabular-nums lining-nums",
+          size === "lg"
+            ? "font-heading text-[2.5rem] leading-none font-medium tracking-[-0.01em]"
+            : "text-[0.9375rem] font-semibold",
         )}
       >
         {formatPrice(product.price)}

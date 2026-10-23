@@ -279,7 +279,7 @@ function ShopMenu({
                       onClick={() => onOpenChange(false)}
                       className="group block"
                     >
-                      <div className="relative aspect-4/5 overflow-hidden rounded-sm bg-muted">
+                      <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-muted">
                         {category.imageUrl ? (
                           <Image
                             src={category.imageUrl}

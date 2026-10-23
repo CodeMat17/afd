@@ -75,7 +75,7 @@ export function MobileMenu({
               {categories.map((category) => (
                 <li key={category.slug}>
                   <Link href={`/shop/${category.slug}`} onClick={close} className="group block">
-                    <div className="relative aspect-5/4 overflow-hidden rounded-sm bg-muted">
+                    <div className="relative aspect-5/4 overflow-hidden rounded-xl bg-muted">
                       {category.imageUrl ? (
                         <Image
                           src={category.imageUrl}

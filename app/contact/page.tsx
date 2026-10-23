@@ -55,7 +55,7 @@ export default function ContactPage() {
           </Reveal>
 
           <Reveal delay={0.1}>
-            <div className="overflow-hidden rounded-md border bg-muted">
+            <div className="overflow-hidden rounded-2xl border bg-muted">
               <iframe
                 title={`Map showing ${site.legalName} on ${site.address.street}, ${site.address.city}`}
                 src={site.maps.embed}
@@ -77,7 +77,7 @@ export default function ContactPage() {
         </div>
 
         <Reveal delay={0.05}>
-          <div className="rounded-md border bg-surface p-6 sm:p-10">
+          <div className="rounded-2xl border bg-surface p-6 sm:p-10">
             <h2 className="font-heading text-4xl">Send a message</h2>
             <p className="mt-2 mb-8 text-sm text-muted-foreground">All fields are required unless marked optional.</p>
             <ContactForm />

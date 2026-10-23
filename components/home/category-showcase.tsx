@@ -75,7 +75,7 @@ function CategoryTile({
   return (
     <Link
       href={`/shop/${category.slug}`}
-      className="group relative block h-full overflow-hidden rounded-sm bg-ink text-ink-foreground"
+      className="group relative block h-full overflow-hidden rounded-2xl bg-ink text-ink-foreground"
     >
       <RevealImage
         delay={delay}

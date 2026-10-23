@@ -49,7 +49,11 @@ export default async function HomePage() {
 
   return (
     <>
-      <Hero images={heroImages} />
+      <Hero
+        images={heroImages}
+        fabrics={categories.map((c) => c.name)}
+        designCount={products.length}
+      />
       <FabricTicker names={categories.map((c) => c.name)} />
       <CategoryShowcase categories={categories} counts={counts} />
       <FeaturedProducts products={featured} categoryNames={categoryNames} />

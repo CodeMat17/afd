@@ -43,10 +43,10 @@ function HeaderView({ categories, pathname }: { categories: NavCategory[]; pathn
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 border-b bg-background transition-[border-color,box-shadow] duration-500",
-        scrolled
-          ? "border-border shadow-[0_10px_30px_-24px_rgb(52_45_40/0.5)]"
-          : "border-transparent",
+        "sticky top-0 z-50 border-b transition-[background-color,border-color,box-shadow] duration-500",
+        scrolled || shopOpen
+          ? "border-border/70 bg-background/80 shadow-[0_10px_30px_-24px_rgb(52_45_40/0.5)] backdrop-blur-xl backdrop-saturate-150"
+          : "border-transparent bg-background",
       )}
     >
       <div className="mx-auto grid h-(--header-height) max-w-360 grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 sm:px-6 lg:grid-cols-[auto_1fr_auto] lg:gap-8 lg:px-10">

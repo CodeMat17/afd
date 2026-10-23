@@ -198,6 +198,16 @@
     @apply bg-background text-foreground;
     font-feature-settings: "ss01", "cv11";
   }
+  h1,
+  h2,
+  h3 {
+    font-kerning: normal;
+    font-feature-settings: "kern", "liga", "dlig";
+  }
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--foreground) 25%, transparent) transparent;
+  }
   ::selection {
     background: var(--terracotta);
     color: #fffaf3;

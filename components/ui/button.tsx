@@ -8,7 +8,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-terracotta-deep",
+          "border-transparent bg-primary text-primary-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_12px_28px_-14px_var(--terracotta)] hover:bg-terracotta-deep hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_18px_36px_-14px_var(--terracotta)]",
         ink: "border-transparent bg-ink text-ink-foreground hover:bg-brown",
         outline:
           "border-foreground/20 bg-transparent text-foreground hover:border-foreground hover:bg-foreground hover:text-background",

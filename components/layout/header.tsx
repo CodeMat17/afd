@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, ChevronDown, Menu, ShoppingBag, User } from "lucide-react";
+import { ArrowRight, ChevronDown, Heart, Menu, Search, ShoppingBag, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -10,11 +10,14 @@ import { Logo } from "@/components/brand/logo";
 import { MobileMenu } from "@/components/layout/mobile-menu";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { useCartCount } from "@/lib/cart/use-cart";
+import { savedStore, useIdList } from "@/lib/id-list-store";
 import { primaryNav } from "@/lib/site";
 import type { ProductCategory } from "@/lib/types";
+import { overlay } from "@/lib/ui-store";
+import { useHydrated } from "@/lib/use-hydrated";
 import { cn } from "@/lib/utils";
 
-export type NavCategory = Pick<ProductCategory, "name" | "slug" | "tagline" | "imageUrl">;
+export type NavCategory = Pick<ProductCategory, "id" | "name" | "slug" | "tagline" | "imageUrl">;
 
 /**
  * usePathname() is request data on routes with unknown params, so the
@@ -80,6 +83,8 @@ function HeaderView({ categories, pathname }: { categories: NavCategory[]; pathn
         </nav>
 
         <div className="flex items-center justify-self-end gap-0.5">
+          <SearchButton />
+          <SavedLink />
           <Link
             href="/account"
             aria-label="Account"
@@ -87,8 +92,10 @@ function HeaderView({ categories, pathname }: { categories: NavCategory[]; pathn
           >
             <User className="size-5" aria-hidden="true" />
           </Link>
-          <ThemeToggle />
-          <CartLink />
+          <span className="hidden sm:contents">
+            <ThemeToggle />
+          </span>
+          <CartButton />
         </div>
       </div>
     </header>
@@ -122,31 +129,78 @@ function NavLink({
   );
 }
 
-export function CartLink() {
+function CountBadge({ count, tone = "primary" }: { count: number; tone?: "primary" | "ink" }) {
+  return (
+    <AnimatePresence>
+      {count > 0 ? (
+        <motion.span
+          key={count}
+          initial={{ scale: 0.4, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.4, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 500, damping: 22 }}
+          aria-hidden="true"
+          className={cn(
+            "absolute top-1 right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[0.6875rem] font-bold tabular-nums",
+            tone === "primary" ? "bg-primary text-primary-foreground" : "bg-foreground text-background",
+          )}
+        >
+          {count}
+        </motion.span>
+      ) : null}
+    </AnimatePresence>
+  );
+}
+
+/** Opens the mini-cart drawer (the full cart page is one tap away inside it). */
+export function CartButton() {
   const count = useCartCount();
   return (
-    <Link
-      href="/cart"
+    <button
+      type="button"
+      onClick={() => overlay.open("cart")}
+      aria-haspopup="dialog"
       aria-label={count > 0 ? `Cart, ${count} ${count === 1 ? "item" : "items"}` : "Cart, empty"}
       className="relative flex size-11 items-center justify-center rounded-full transition-colors hover:bg-muted"
     >
       <ShoppingBag className="size-5" aria-hidden="true" />
-      <AnimatePresence>
-        {count > 0 ? (
-          <motion.span
-            key={count}
-            initial={{ scale: 0.4, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.4, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 500, damping: 22 }}
-            aria-hidden="true"
-            className="absolute top-1 right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[0.6875rem] font-bold text-primary-foreground tabular-nums"
-          >
-            {count}
-          </motion.span>
-        ) : null}
-      </AnimatePresence>
+      <CountBadge count={count} />
+    </button>
+  );
+}
+
+function SavedLink() {
+  const hydrated = useHydrated();
+  const saved = useIdList(savedStore).length;
+  const count = hydrated ? saved : 0;
+  return (
+    <Link
+      href="/saved"
+      aria-label={count > 0 ? `Saved, ${count} ${count === 1 ? "item" : "items"}` : "Saved items"}
+      className="relative hidden size-11 items-center justify-center rounded-full transition-colors hover:bg-muted sm:flex"
+    >
+      <Heart className="size-5" aria-hidden="true" />
+      <CountBadge count={count} tone="ink" />
     </Link>
+  );
+}
+
+function SearchButton() {
+  return (
+    <button
+      type="button"
+      onClick={() => overlay.open("search")}
+      aria-haspopup="dialog"
+      aria-label="Search"
+      aria-keyshortcuts="/ Control+K Meta+K"
+      className="group flex size-11 items-center justify-center gap-2 rounded-full transition-colors hover:bg-muted xl:mr-2 xl:w-56 xl:justify-start xl:border xl:border-input xl:bg-surface xl:px-4 xl:text-sm xl:text-muted-foreground xl:hover:border-foreground xl:hover:bg-surface"
+    >
+      <Search className="size-5 xl:size-4" aria-hidden="true" />
+      <span className="hidden flex-1 text-left xl:inline">Search fabrics…</span>
+      <kbd className="hidden h-5 items-center rounded border bg-background px-1.5 font-sans text-[0.6875rem] font-semibold xl:inline-flex">
+        /
+      </kbd>
+    </button>
   );
 }
 

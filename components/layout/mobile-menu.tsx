@@ -1,12 +1,14 @@
 "use client";
 
-import { ArrowUpRight, Mail, MapPin, Phone, User, X } from "lucide-react";
+import { ArrowUpRight, Heart, Mail, MapPin, Phone, Search, User, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import type { NavCategory } from "@/components/layout/header";
 import { primaryNav, site } from "@/lib/site";
+import { overlay } from "@/lib/ui-store";
 import { useDialog } from "@/lib/use-dialog";
 import { whatsappUrl } from "@/lib/whatsapp";
 
@@ -54,6 +56,20 @@ export function MobileMenu({
             </button>
           </div>
 
+          <div className="px-5 pt-5">
+            <button
+              type="button"
+              onClick={() => {
+                close();
+                overlay.open("search");
+              }}
+              className="flex h-12 w-full items-center gap-3 rounded-full border border-input bg-surface px-4 text-sm text-muted-foreground"
+            >
+              <Search className="size-4" aria-hidden="true" />
+              Search fabrics, colours, SKUs…
+            </button>
+          </div>
+
           <nav aria-label="Mobile" className="px-5 pt-6">
             <ul className="space-y-1">
               {primaryNav.map((item) => (
@@ -94,8 +110,15 @@ export function MobileMenu({
           </nav>
 
           <div className="mt-auto space-y-1 border-t px-5 py-6 text-sm">
+            <div className="mb-3 flex items-center justify-between rounded-full border pl-4">
+              <span className="text-sm font-semibold">Appearance</span>
+              <ThemeToggle />
+            </div>
             <Link href="/account" onClick={close} className="flex min-h-11 items-center gap-3">
               <User className="size-4" aria-hidden="true" /> Account
+            </Link>
+            <Link href="/saved" onClick={close} className="flex min-h-11 items-center gap-3">
+              <Heart className="size-4" aria-hidden="true" /> Saved fabrics
             </Link>
             <a href={site.phone.href} className="flex min-h-11 items-center gap-3">
               <Phone className="size-4" aria-hidden="true" /> {site.phone.display}

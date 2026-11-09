@@ -6,23 +6,12 @@ import Link from "next/link";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import { Price } from "@/components/product/price";
 import { Badge } from "@/components/ui/badge";
+import { SaveButton } from "@/components/product/save-button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { cartActions } from "@/lib/cart/store";
-import { notify } from "@/lib/notify";
+import { addToCart } from "@/lib/cart/add-to-cart";
 import type { Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { productEnquiryUrl, unitLabel } from "@/lib/whatsapp";
-
-export function addToCartWithNotice(product: Product, quantity: string) {
-  cartActions.add(product, quantity);
-  const image = product.images[0];
-  notify({
-    title: "Added to cart",
-    description: `${product.name} · ${quantity} ${unitLabel(product.unit, quantity)}`,
-    imageUrl: image?.imageUrl,
-    action: { label: "View cart", href: "/cart" },
-  });
-}
 
 export function ProductCard({
   product,
@@ -66,10 +55,17 @@ export function ProductCard({
           ) : null}
         </Link>
 
+        <SaveButton
+          productId={product.id}
+          productName={product.name}
+          imageUrl={image?.imageUrl}
+          className="absolute top-3 right-3"
+        />
+
         {product.isAvailable ? (
           <button
             type="button"
-            onClick={() => addToCartWithNotice(product, product.minimumQuantity)}
+            onClick={() => addToCart(product, product.minimumQuantity)}
             aria-label={`Add to cart: ${product.name}`}
             className={cn(
               "absolute right-3 bottom-3 flex size-10 items-center justify-center gap-2 rounded-full border border-white/20 bg-background/80 text-sm font-semibold text-foreground shadow-[0_10px_30px_-12px_rgb(15_12_10/0.6)] backdrop-blur-xl transition-[translate,opacity,background-color,color] duration-500 ease-silk hover:bg-primary hover:text-primary-foreground",

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CartView } from "@/components/cart/cart-view";
+import { RecentlyViewed } from "@/components/product/recently-viewed";
 import { Container, PageHeader } from "@/components/ui/section";
 import { catalog } from "@/lib/repository";
 
@@ -16,6 +17,7 @@ export default async function CartPage() {
       <Container className="py-10 pb-24 lg:py-14">
         <CartView products={products} />
       </Container>
+      <RecentlyViewed className="border-t bg-surface py-20" />
     </>
   );
 }

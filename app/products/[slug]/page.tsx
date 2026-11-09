@@ -6,6 +6,7 @@ import { Price } from "@/components/product/price";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { ProductGrid } from "@/components/product/product-grid";
 import { PurchasePanel } from "@/components/product/purchase-panel";
+import { RecentlyViewed, TrackRecentlyViewed } from "@/components/product/recently-viewed";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Container, SectionHeading } from "@/components/ui/section";
 import { catalog } from "@/lib/repository";
@@ -152,6 +153,9 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
           </Container>
         </section>
       ) : null}
+
+      <TrackRecentlyViewed productId={product.id} />
+      <RecentlyViewed excludeId={product.id} className="border-t py-20 lg:py-28" />
     </>
   );
 }

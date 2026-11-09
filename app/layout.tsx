@@ -4,7 +4,10 @@ import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { FloatingCart } from "@/components/layout/floating-cart";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { CartDrawer } from "@/components/cart/cart-drawer";
 import { Providers } from "@/components/providers";
+import { CatalogProvider } from "@/components/providers/catalog-provider";
+import { SearchDialog } from "@/components/search/search-dialog";
 import { catalog } from "@/lib/repository";
 import { site } from "@/lib/site";
 import "./globals.css";
@@ -51,8 +54,9 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const categories = await catalog.getCategories();
-  const nav = categories.map(({ name, slug, tagline, imageUrl }) => ({
+  const [categories, products] = await Promise.all([catalog.getCategories(), catalog.getProducts()]);
+  const nav = categories.map(({ id, name, slug, tagline, imageUrl }) => ({
+    id,
     name,
     slug,
     tagline,
@@ -69,13 +73,17 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         <Providers>
-          {/* <AnnouncementBar /> */}
-          <Header categories={nav} />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-          <Footer categories={nav} />
-          <FloatingCart />
+          <CatalogProvider products={products} categories={nav}>
+            {/* <AnnouncementBar /> */}
+            <Header categories={nav} />
+            <main id="main" className="flex-1">
+              {children}
+            </main>
+            <Footer categories={nav} />
+            <FloatingCart />
+            <CartDrawer />
+            <SearchDialog />
+          </CatalogProvider>
         </Providers>
       </body>
     </html>

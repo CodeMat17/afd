@@ -109,6 +109,16 @@ export const signUpSchema = z
 
 export const forgotPasswordSchema = z.object({ email });
 
+export const resetPasswordSchema = z
+  .object({
+    password,
+    confirmPassword: z.string().min(1, "Confirm your password."),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match.",
+  });
+
 export type FieldErrors = Record<string, string>;
 
 /** First error message per field, keyed by top-level field name. */

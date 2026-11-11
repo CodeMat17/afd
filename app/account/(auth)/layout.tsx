@@ -1,6 +1,5 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
-import { PreviewNotice } from "@/components/ui/section";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
@@ -21,10 +20,6 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <div className="flex items-center justify-center px-4 py-14 sm:px-6 lg:px-16">
         <div className="w-full max-w-md">
           {children}
-          <PreviewNotice title="Accounts are in preview" className="mt-10">
-            Sign-in isn&apos;t connected to a secure service yet, so no account is created and nothing
-            you type is stored. Your cart stays on this device.
-          </PreviewNotice>
         </div>
       </div>
     </div>

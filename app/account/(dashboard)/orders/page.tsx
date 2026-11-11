@@ -15,14 +15,12 @@ export default function OrdersPage() {
         </span>
         <p className="mt-6 font-heading text-3xl">No orders to show</p>
         <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
-          Once online ordering and accounts are live, orders you place will appear here.
+          Order history in your account is coming soon. Your order confirmation page has your
+          order details in the meantime.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link href="/shop" className={buttonVariants()}>
             Shop the collection
-          </Link>
-          <Link href="/account/sign-in" className={buttonVariants({ variant: "outline" })}>
-            Sign in
           </Link>
         </div>
       </div>

@@ -1,6 +1,7 @@
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { AccountNav } from "@/components/account/account-nav";
 import { Container, PageHeader } from "@/components/ui/section";
+import { requireCustomer } from "@/lib/auth-server";
 
 export default function AccountLayout({ children }: { children: ReactNode }) {
   return (
@@ -10,8 +11,19 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
         <aside>
           <AccountNav />
         </aside>
-        <div>{children}</div>
+        <div>
+          {/* Reading the session happens per request, so it streams in here. */}
+          <Suspense fallback={<div className="h-48 animate-pulse rounded-2xl bg-muted" />}>
+            <SignedIn>{children}</SignedIn>
+          </Suspense>
+        </div>
       </Container>
     </>
   );
+}
+
+/** Signed-out visitors are sent to the sign-in page. */
+async function SignedIn({ children }: { children: ReactNode }) {
+  await requireCustomer();
+  return children;
 }

@@ -9,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     catalog.getDepartments(),
   ]);
 
-  const staticRoutes = ["", "/shop", "/gallery", "/about", "/contact", "/shipping-returns"];
+  const staticRoutes = ["", "/shop", "/gallery", "/about", "/contact"];
 
   return [
     ...staticRoutes.map((path) => ({ url: `${site.url}${path}` })),

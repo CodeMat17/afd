@@ -43,9 +43,3 @@ export const primaryNav = [
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ] as const;
-
-export const policyNav = [
-  { label: "Shipping & Returns", href: "/shipping-returns" },
-  { label: "Privacy", href: "/privacy" },
-  { label: "Terms", href: "/terms" },
-] as const;

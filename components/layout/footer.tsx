@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import type { NavDepartment } from "@/lib/catalog-tree";
 import { telHref, type ContactDetails } from "@/lib/contact";
-import { policyNav, primaryNav, site } from "@/lib/site";
+import { primaryNav, site } from "@/lib/site";
 import { whatsappUrl } from "@/lib/whatsapp";
 
 async function CopyrightYear() {
@@ -105,19 +105,10 @@ export function Footer({ departments, contact }: { departments: NavDepartment[];
       </div>
 
       <div className="border-t border-band-foreground/10">
-        <div className="mx-auto flex max-w-360 flex-col gap-4 px-4 py-6 text-xs text-band-muted sm:px-6 md:flex-row md:items-center md:justify-between lg:px-10">
+        <div className="mx-auto max-w-360 px-4 py-6 text-xs text-band-muted sm:px-6 lg:px-10">
           <p>
             © <CopyrightYear /> {site.legalName}. All rights reserved.
           </p>
-          <ul className="flex flex-wrap gap-x-6 gap-y-2">
-            {policyNav.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href} className="inline-flex min-h-8 items-center hover:text-primary">
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </footer>

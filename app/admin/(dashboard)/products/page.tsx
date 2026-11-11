@@ -5,7 +5,17 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { DeleteProductButton } from "@/components/admin/delete-product-button";
 import { StockBadge } from "@/components/admin/stock-badge";
-import { EmptyState, FilterTabs, PageHeader, PanelSkeleton, SearchBox, StatCard, ToneBadge } from "@/components/admin/ui";
+import { redirect } from "next/navigation";
+import {
+  EmptyState,
+  FilterTabs,
+  PageHeader,
+  Pagination,
+  PanelSkeleton,
+  SearchBox,
+  StatCard,
+  ToneBadge,
+} from "@/components/admin/ui";
 import { buttonVariants } from "@/components/ui/button";
 import { getAdminCatalog } from "@/lib/admin/catalog";
 import { requireAdmin } from "@/lib/admin/session";
@@ -18,9 +28,10 @@ const FILTERS = [
   { key: "all", label: "All products" },
   { key: "low", label: "Running low" },
   { key: "out", label: "Sold out" },
-  { key: "untracked", label: "Not counted yet" },
 ] as const;
 type Filter = (typeof FILTERS)[number]["key"];
+
+const PAGE_SIZE = 20;
 
 export default function AdminProductsPage(props: PageProps<"/admin/products">) {
   return (
@@ -82,14 +93,13 @@ async function Products({ searchParams }: PageProps<"/admin/products">) {
   const q = (first(query.q) ?? "").trim();
   const needle = q.toLowerCase();
 
-  const counts: Record<Filter, number> = { all: products.length, low: 0, out: 0, untracked: 0 };
+  const counts: Record<Filter, number> = { all: products.length, low: 0, out: 0 };
   let piecesInStock = 0;
   let live = 0;
   for (const p of products) {
     const status = stockStatus(p.stockQuantity);
     if (status === "low") counts.low++;
     if (status === "out") counts.out++;
-    if (status === "untracked") counts.untracked++;
     if (p.isAvailable) live++;
     if (p.stockQuantity !== null) piecesInStock += Math.max(Number(p.stockQuantity), 0);
   }
@@ -105,17 +115,33 @@ async function Products({ searchParams }: PageProps<"/admin/products">) {
         (categoryName.get(p.categoryId) ?? "").toLowerCase().includes(needle),
     )
     .sort((a, b) => {
-      if (filter === "low" || filter === "out") return Number(a.stockQuantity) - Number(b.stockQuantity);
-      return a.name.localeCompare(b.name);
+      // Fully deterministic order, so a product never shows up on two pages or on none.
+      if (filter === "low" || filter === "out") {
+        const byStock = Number(a.stockQuantity) - Number(b.stockQuantity);
+        if (byStock !== 0) return byStock;
+      }
+      return a.name.localeCompare(b.name) || a._id.localeCompare(b._id);
     });
 
-  const tabHref = (key: Filter) => {
+  const buildHref = (key: Filter, page = 1) => {
     const params = new URLSearchParams();
     if (key !== "all") params.set("stock", key);
     if (q) params.set("q", q);
+    if (page > 1) params.set("page", String(page));
     const str = params.toString();
     return str ? `/admin/products?${str}` : "/admin/products";
   };
+  // Switching tabs or searching always starts again from page 1.
+  const tabHref = (key: Filter) => buildHref(key);
+
+  const pageCount = Math.max(1, Math.ceil(shown.length / PAGE_SIZE));
+  const pageParam = first(query.page);
+  const requested = pageParam === undefined ? 1 : Number(pageParam);
+  const page = Number.isInteger(requested) ? Math.min(Math.max(requested, 1), pageCount) : 1;
+  // Keep the URL canonical: "?page=0", "?page=abc", "?page=1" or a page past the end
+  // (e.g. after deleting the last product on it) land on the real page.
+  if (pageParam !== undefined && (pageParam !== String(page) || page === 1)) redirect(buildHref(filter, page));
+  const pageItems = shown.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div className="space-y-6">
@@ -149,7 +175,7 @@ async function Products({ searchParams }: PageProps<"/admin/products">) {
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <FilterTabs
           label="Filter by stock"
-          items={FILTERS.filter((f) => f.key !== "untracked" || counts.untracked > 0 || filter === "untracked").map((f) => ({
+          items={FILTERS.map((f) => ({
             href: tabHref(f.key),
             label: f.label,
             count: counts[f.key],
@@ -170,18 +196,11 @@ async function Products({ searchParams }: PageProps<"/admin/products">) {
           title={
             q
               ? "No matching products"
-              : filter === "untracked"
-                ? "Every product has a stock count"
-                : filter === "out"
-                  ? "Nothing is sold out"
-                  : "Nothing is running low"
+              : filter === "out"
+                ? "Nothing is sold out"
+                : "Nothing is running low"
           }
-          description={
-            q
-              ? `Nothing matches “${q}”.`
-              : filter === "untracked"
-                ? "The shop knows when each product sells out."
-                : "Good news — your shelves are well stocked."
+          description={q ? `Nothing matches “${q}”.` : "Good news — your shelves are well stocked."
           }
           action={
             <Link href="/admin/products" className="text-sm font-semibold text-primary underline-offset-4 hover:underline">
@@ -207,7 +226,7 @@ async function Products({ searchParams }: PageProps<"/admin/products">) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-foreground/[0.06]">
-                {shown.map((p) => (
+                {pageItems.map((p) => (
                   <tr key={p._id} className="transition-colors hover:bg-muted/50">
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-3.5">
@@ -262,7 +281,7 @@ async function Products({ searchParams }: PageProps<"/admin/products">) {
 
           {/* Phones: cards */}
           <ul className="space-y-3 md:hidden">
-            {shown.map((p) => (
+            {pageItems.map((p) => (
               <li key={p._id}>
                 <Link
                   href={`/admin/products/${p._id}`}
@@ -285,6 +304,15 @@ async function Products({ searchParams }: PageProps<"/admin/products">) {
               </li>
             ))}
           </ul>
+
+          <Pagination
+            page={page}
+            pageCount={pageCount}
+            pageSize={PAGE_SIZE}
+            total={shown.length}
+            href={(n) => buildHref(filter, n)}
+            noun={shown.length === 1 ? "product" : "products"}
+          />
         </>
       )}
     </div>

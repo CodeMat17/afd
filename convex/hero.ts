@@ -10,7 +10,8 @@ import { cloudImage } from "./schema";
  * products leaves the hero exactly as the admin set it.
  */
 
-export const MAX_HERO_IMAGES = 24;
+export const MIN_HERO_IMAGES = 9;
+export const MAX_HERO_IMAGES = 15;
 
 /** Public: the storefront renders these. */
 export const get = query({
@@ -28,8 +29,8 @@ export const save = mutation({
   args: { serverSecret: v.string(), images: v.array(cloudImage) },
   handler: async (ctx, { serverSecret, images }) => {
     assertServer(serverSecret);
-    if (images.length > MAX_HERO_IMAGES) {
-      throw new ConvexError(`The hero can show at most ${MAX_HERO_IMAGES} photos.`);
+    if (images.length < MIN_HERO_IMAGES || images.length > MAX_HERO_IMAGES) {
+      throw new ConvexError(`The hero needs ${MIN_HERO_IMAGES}–${MAX_HERO_IMAGES} photos (you have ${images.length}).`);
     }
     if (new Set(images.map((i) => i.publicId)).size !== images.length) {
       throw new ConvexError("The same photo is in the list twice.");

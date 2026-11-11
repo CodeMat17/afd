@@ -6,6 +6,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo } from "react";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
+import { useContact } from "@/components/providers/contact-provider";
 import { QuantityStepper } from "@/components/product/quantity-stepper";
 import { buttonVariants } from "@/components/ui/button";
 import { PreviewNotice } from "@/components/ui/section";
@@ -17,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { unitLabel, whatsappUrl } from "@/lib/whatsapp";
 
 export function CartView({ products }: { products: Product[] }) {
+  const contact = useContact();
   const cart = useCart();
   const byId = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
 
@@ -55,7 +57,7 @@ export function CartView({ products }: { products: Product[] }) {
     );
   }
 
-  const enquiry = whatsappUrl(
+  const enquiry = whatsappUrl(contact.whatsapp,
     [
       `Hello ${site.name}, I'd like to enquire about these items:`,
       ...valid.map(

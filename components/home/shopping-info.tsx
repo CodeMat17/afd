@@ -3,10 +3,13 @@ import type { ReactNode } from "react";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import { Reveal } from "@/components/motion/reveal";
 import { Container } from "@/components/ui/section";
+import { telHref } from "@/lib/contact";
+import { getContactDetails } from "@/lib/contact-server";
 import { site } from "@/lib/site";
 
 /** Confirmed facts only — no invented guarantees, timings or testimonials. */
-export function ShoppingInfo() {
+export async function ShoppingInfo() {
+  const contact = await getContactDetails();
   const items: { icon: ReactNode; title: string; body: ReactNode }[] = [
     {
       icon: <MapPin className="size-5" aria-hidden="true" />,
@@ -35,9 +38,9 @@ export function ShoppingInfo() {
       title: "Talk to us",
       body: (
         <>
-          <a href={site.phone.href} className="hover:text-primary">{site.phone.display}</a>
+          <a href={telHref(contact.phone)} className="hover:text-primary">{contact.phone}</a>
           <br />
-          <a href={`mailto:${site.email}`} className="break-all hover:text-primary">{site.email}</a>
+          <a href={`mailto:${contact.email}`} className="break-all hover:text-primary">{contact.email}</a>
         </>
       ),
     },

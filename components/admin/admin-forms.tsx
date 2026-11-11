@@ -1,12 +1,14 @@
 "use client";
 
-import { Calculator, Loader2, Lock, Percent, Truck } from "lucide-react";
+import { Calculator, Loader2, Lock, Mail, Percent, Phone, Truck } from "lucide-react";
 import { useActionState, useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
-import { login, saveSettings, type FormState } from "@/app/admin/actions";
+import { login, saveContact, saveSettings, type FormState } from "@/app/admin/actions";
 import { FormAlert } from "@/components/forms/form-alert";
 import { TextField } from "@/components/forms/field";
+import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import { Button } from "@/components/ui/button";
+import { telHref, whatsappDigits, type ContactDetails } from "@/lib/contact";
 import { formatCents, toCents } from "@/lib/money";
 
 export function LoginForm({ next }: { next?: string }) {
@@ -175,5 +177,106 @@ function Line({ label, value }: { label: string; value: string }) {
       <dt className="text-band-muted">{label}</dt>
       <dd className="tabular-nums">{value}</dd>
     </div>
+  );
+}
+
+/** Phone, WhatsApp and email shown in the header menu, footer, contact page and every WhatsApp button. */
+export function ContactDetailsForm({ contact }: { contact: ContactDetails }) {
+  const [state, action, pending] = useActionState<FormState, FormData>(saveContact, null);
+  const [phone, setPhone] = useState(contact.phone);
+  const [whatsapp, setWhatsapp] = useState(contact.whatsapp);
+  const [email, setEmail] = useState(contact.email);
+
+  useEffect(() => {
+    if (!state) return;
+    if (state.ok) toast.success("Saved", { description: state.message });
+    else toast.error("Not saved", { description: state.message, duration: 7000 });
+  }, [state]);
+
+  const waDigits = whatsappDigits(whatsapp);
+
+  return (
+    <form action={action} className="grid gap-6 lg:grid-cols-[1fr_20rem]">
+      <div className="space-y-6">
+        <SettingCard
+          icon={Phone}
+          title="Contact details"
+          description="Shown in the menu, footer, contact page and policy pages. Every WhatsApp button on the site messages the WhatsApp number."
+        >
+          <div className="space-y-5">
+            <TextField
+              id="contactPhone"
+              name="phone"
+              type="tel"
+              label="Phone number"
+              autoComplete="off"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              hint="Include the country code, e.g. +254 710 660 524. Shown exactly as typed."
+            />
+            <TextField
+              id="contactWhatsapp"
+              name="whatsapp"
+              type="tel"
+              label="WhatsApp number"
+              autoComplete="off"
+              value={whatsapp}
+              onChange={(e) => setWhatsapp(e.target.value)}
+              hint="Include the country code. Can be the same as the phone number."
+            />
+            <TextField
+              id="contactEmail"
+              name="email"
+              type="email"
+              label="Email address"
+              autoComplete="off"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+        </SettingCard>
+
+        {state && !state.ok ? (
+          <FormAlert tone="error" title="Not saved">
+            {state.message}
+          </FormAlert>
+        ) : null}
+
+        <div className="flex flex-wrap items-center gap-4">
+          <Button type="submit" size="lg" disabled={pending}>
+            {pending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : null}
+            {pending ? "Saving…" : "Save contact details"}
+          </Button>
+          <p className="text-xs text-muted-foreground">The whole site updates as soon as you save.</p>
+        </div>
+      </div>
+
+      <aside className="h-fit rounded-2xl bg-band p-5 text-band-foreground lg:sticky lg:top-8">
+        <p className="text-sm font-semibold">Check before saving</p>
+        <p className="mt-1 text-xs text-band-muted">Tap each link to make sure it reaches you.</p>
+        <ul className="mt-5 space-y-3 text-sm">
+          <li>
+            <a href={telHref(phone)} className="flex items-center gap-2.5 break-all hover:underline">
+              <Phone className="size-4 shrink-0" aria-hidden="true" /> {phone || "—"}
+            </a>
+          </li>
+          <li>
+            <a
+              href={`https://wa.me/${waDigits}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2.5 break-all hover:underline"
+            >
+              <WhatsAppIcon className="size-4 shrink-0" /> {waDigits ? `wa.me/${waDigits}` : "—"}
+            </a>
+          </li>
+          <li>
+            <a href={`mailto:${email}`} className="flex items-center gap-2.5 break-all hover:underline">
+              <Mail className="size-4 shrink-0" aria-hidden="true" /> {email || "—"}
+            </a>
+          </li>
+        </ul>
+      </aside>
+    </form>
   );
 }

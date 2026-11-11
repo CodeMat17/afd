@@ -8,6 +8,7 @@ import { useMemo, useRef, useState, type FormEvent } from "react";
 import { FormAlert } from "@/components/forms/form-alert";
 import { TextAreaField, TextField, focusFirstInvalid } from "@/components/forms/field";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
+import { useContact } from "@/components/providers/contact-provider";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { startCheckout } from "@/app/checkout/actions";
 import { cartLineImage, useCart } from "@/lib/cart/use-cart";
@@ -40,6 +41,7 @@ const optionCard =
   "flex cursor-pointer gap-4 rounded-2xl border bg-surface p-4 transition-colors has-checked:border-foreground";
 
 export function CheckoutForm({ products, settings }: { products: Product[]; settings: CheckoutSettings }) {
+  const contact = useContact();
   const cart = useCart();
   const formRef = useRef<HTMLFormElement>(null);
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -122,7 +124,7 @@ export function CheckoutForm({ products, settings }: { products: Product[]; sett
     );
   }
 
-  const whatsappOrder = whatsappUrl(
+  const whatsappOrder = whatsappUrl(contact.whatsapp,
     [
       `Hello ${site.name}, I'd like to order:`,
       ...lines.map(

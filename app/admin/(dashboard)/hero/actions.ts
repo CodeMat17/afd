@@ -17,7 +17,8 @@ import { HERO_TAG } from "@/lib/repository";
 
 export type HeroActionResult = { ok: boolean; message: string };
 
-const MAX_HERO_IMAGES = 24;
+const MIN_HERO_IMAGES = 9;
+const MAX_HERO_IMAGES = 15;
 
 /** Lets the browser upload hero photos straight to Cloudinary (folder afd/hero). */
 export async function getHeroUploadSignature(): Promise<UploadSignature | { error: string }> {
@@ -37,6 +38,7 @@ const imagesSchema = z
       height: z.number().int().positive(),
     }),
   )
+  .min(MIN_HERO_IMAGES, `The hero needs at least ${MIN_HERO_IMAGES} photos.`)
   .max(MAX_HERO_IMAGES, `The hero can show at most ${MAX_HERO_IMAGES} photos.`);
 
 /**
@@ -71,6 +73,6 @@ export async function saveHero(input: unknown): Promise<HeroActionResult> {
   }
   return {
     ok: true,
-    message: images.length === 0 ? "Saved. The hero shows no photos until you add some." : "Saved. The home page shows the new hero now.",
+    message: "Saved. The home page shows the new hero now.",
   };
 }

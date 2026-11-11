@@ -1,5 +1,7 @@
 "use server";
 
+import { ConvexError } from "convex/values";
+import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import {
   checkPassword,
@@ -10,6 +12,7 @@ import {
   requireAdmin,
   safeAdminPath,
 } from "@/lib/admin/session";
+import { CONTACT_TAG } from "@/lib/contact-server";
 import { api, convexClient, serverSecret } from "@/lib/convex/server";
 import { toCents } from "@/lib/money";
 
@@ -85,4 +88,32 @@ export async function saveSettings(_prev: FormState, formData: FormData): Promis
     return { ok: false, message: "Couldn't save settings. Please try again." };
   }
   return { ok: true, message: "Settings saved. Checkout uses the new values immediately." };
+}
+
+export async function saveContact(_prev: FormState, formData: FormData): Promise<FormState> {
+  await requireAdmin();
+
+  const field = (name: string) => String(formData.get(name) ?? "").trim();
+  const phone = field("phone");
+  const whatsapp = field("whatsapp");
+  const email = field("email");
+  const digits = (value: string) => value.replace(/\D/g, "").length;
+  for (const [label, value] of [["Phone", phone], ["WhatsApp", whatsapp]] as const) {
+    if (!/^\+?[\d\s()-]+$/.test(value) || digits(value) < 7 || digits(value) > 15) {
+      return { ok: false, message: `${label} number must be 7–15 digits, with the country code, e.g. +254 710 660 524.` };
+    }
+  }
+  if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { ok: false, message: "Enter a valid email address." };
+  }
+
+  try {
+    await convexClient().mutation(api.contact.update, { serverSecret: serverSecret(), phone, whatsapp, email });
+  } catch (error) {
+    if (error instanceof ConvexError && typeof error.data === "string") return { ok: false, message: error.data };
+    console.error("[admin] failed to save contact details", error);
+    return { ok: false, message: "Couldn't save contact details. Please try again." };
+  }
+  updateTag(CONTACT_TAG);
+  return { ok: true, message: "Contact details saved. The whole site shows them now." };
 }

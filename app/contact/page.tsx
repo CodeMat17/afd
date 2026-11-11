@@ -5,16 +5,22 @@ import { ContactForm } from "@/components/contact/contact-form";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import { Reveal } from "@/components/motion/reveal";
 import { Container, PageHeader } from "@/components/ui/section";
+import { telHref } from "@/lib/contact";
+import { getContactDetails } from "@/lib/contact-server";
 import { site } from "@/lib/site";
 import { whatsappUrl } from "@/lib/whatsapp";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description: `Visit ${site.legalName} on ${site.address.street}, ${site.address.city}, or call ${site.phone.display}.`,
-  alternates: { canonical: "/contact" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const contact = await getContactDetails();
+  return {
+    title: "Contact",
+    description: `Visit ${site.legalName} on ${site.address.street}, ${site.address.city}, or call ${contact.phone}.`,
+    alternates: { canonical: "/contact" },
+  };
+}
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const contact = await getContactDetails();
   return (
     <>
       <PageHeader
@@ -36,14 +42,14 @@ export default function ContactPage() {
                 {site.address.street}, {site.address.city}, {site.address.country}
               </ContactRow>
               <ContactRow icon={<Phone className="size-4" aria-hidden="true" />} label="Phone">
-                <a href={site.phone.href} className="hover:text-primary">{site.phone.display}</a>
+                <a href={telHref(contact.phone)} className="hover:text-primary">{contact.phone}</a>
               </ContactRow>
               <ContactRow icon={<Mail className="size-4" aria-hidden="true" />} label="Email">
-                <a href={`mailto:${site.email}`} className="break-all hover:text-primary">{site.email}</a>
+                <a href={`mailto:${contact.email}`} className="break-all hover:text-primary">{contact.email}</a>
               </ContactRow>
               <ContactRow icon={<WhatsAppIcon className="size-4" />} label="WhatsApp">
                 <a
-                  href={whatsappUrl(`Hello ${site.name}`)}
+                  href={whatsappUrl(contact.whatsapp, `Hello ${site.name}`)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-whatsapp hover:underline"

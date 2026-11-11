@@ -16,7 +16,8 @@ export interface HeroPhoto {
   height: number;
 }
 
-const MAX_IMAGES = 24;
+const MIN_IMAGES = 9;
+const MAX_IMAGES = 15;
 const MAX_BYTES = 10 * 1024 * 1024;
 
 /**
@@ -32,6 +33,7 @@ export function HeroForm({ images: saved, updatedAt }: { images: HeroPhoto[]; up
 
   const dirty =
     images.length !== saved.length || images.some((image, i) => image.publicId !== saved[i]?.publicId);
+  const tooFew = images.length < MIN_IMAGES;
 
   async function onFiles(event: ChangeEvent<HTMLInputElement>) {
     const files = [...(event.target.files ?? [])];
@@ -42,7 +44,9 @@ export function HeroForm({ images: saved, updatedAt }: { images: HeroPhoto[]; up
     const room = MAX_IMAGES - images.length - uploading;
     const accepted = files.filter((f) => f.type.startsWith("image/") && f.size <= MAX_BYTES).slice(0, room);
     if (accepted.length < files.length) {
-      setUploadError(`Some files were skipped: photos must be images under 10 MB, up to ${MAX_IMAGES} in the hero.`);
+      setUploadError(
+        `Some files were skipped: photos must be images under 10 MB, and the hero holds at most ${MAX_IMAGES}.`,
+      );
     }
     if (accepted.length === 0) return;
 
@@ -100,16 +104,13 @@ export function HeroForm({ images: saved, updatedAt }: { images: HeroPhoto[]; up
 
   return (
     <div className="space-y-6">
-      {images.length > 0 && images.length < 6 ? (
-        <FormAlert tone="info" title="Tip: add a few more photos">
-          The hero scrolls in three columns on large screens. With fewer than 6 photos they repeat; 9–15 looks best.
-        </FormAlert>
-      ) : null}
-      {images.length === 0 && uploading === 0 ? (
-        <FormAlert tone="info" title="No hero photos yet">
-          Until you add and save some, the home page shows the headline on its own.
-        </FormAlert>
-      ) : null}
+      <FormAlert tone="info" title={`${images.length} photos (${MIN_IMAGES}–${MAX_IMAGES} required)`}>
+        {tooFew
+          ? `The hero needs at least ${MIN_IMAGES} photos and holds up to ${MAX_IMAGES}. Add ${MIN_IMAGES - images.length} more to save.`
+          : images.length === MAX_IMAGES
+            ? `That's the maximum. Remove a photo to add a different one.`
+            : `Ready to save. You can add up to ${MAX_IMAGES - images.length} more.`}
+      </FormAlert>
 
       <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {images.map((image, index) => (
@@ -160,7 +161,7 @@ export function HeroForm({ images: saved, updatedAt }: { images: HeroPhoto[]; up
       </p>
 
       <div className="flex flex-wrap items-center gap-4 border-t pt-6">
-        <Button type="button" size="lg" onClick={onSave} disabled={pending || uploading > 0 || !dirty}>
+        <Button type="button" size="lg" onClick={onSave} disabled={pending || uploading > 0 || !dirty || tooFew}>
           {pending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : null}
           {pending ? "Saving…" : "Save hero"}
         </Button>
@@ -170,7 +171,9 @@ export function HeroForm({ images: saved, updatedAt }: { images: HeroPhoto[]; up
           </Button>
         ) : null}
         <p className="text-xs text-muted-foreground">
-          {dirty
+          {dirty && tooFew
+            ? `Add ${MIN_IMAGES - images.length} more photo${MIN_IMAGES - images.length === 1 ? "" : "s"} to save. The home page keeps the current hero until then.`
+            : dirty
             ? "Unsaved changes. The home page keeps the current hero until you save."
             : updatedAt
               ? `Last saved ${updatedAt}.`

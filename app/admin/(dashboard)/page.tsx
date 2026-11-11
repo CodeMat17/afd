@@ -193,7 +193,7 @@ async function Overview() {
       icon: ClipboardList,
       title: `${untracked} product${untracked === 1 ? " has" : "s have"} no stock count`,
       body: "They never show as sold out, so customers could order pieces you don't have. Open each one and enter the number in stock.",
-      href: "/admin/products?stock=untracked",
+      href: "/admin/products",
       cta: "Count",
     });
   }

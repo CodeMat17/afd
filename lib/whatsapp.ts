@@ -1,3 +1,4 @@
+import { whatsappDigits } from "@/lib/contact";
 import { site } from "@/lib/site";
 import type { Product } from "@/lib/types";
 
@@ -11,11 +12,13 @@ export function unitLabel(unit: Product["unit"], quantity = "1"): string {
   return quantity === "1" ? unit : UNIT_PLURAL[unit];
 }
 
-export function whatsappUrl(message: string): string {
-  return `https://wa.me/${site.phone.whatsapp}?text=${encodeURIComponent(message)}`;
+/** `number` is the showroom's WhatsApp number (from `useContact()` / `getContactDetails()`). */
+export function whatsappUrl(number: string, message: string): string {
+  return `https://wa.me/${whatsappDigits(number)}?text=${encodeURIComponent(message)}`;
 }
 
 export function productEnquiryUrl(
+  number: string,
   product: Pick<Product, "name" | "sku" | "slug" | "unit">,
   quantity?: string,
 ): string {
@@ -28,5 +31,5 @@ export function productEnquiryUrl(
     lines.push(`• Quantity: ${quantity} ${unitLabel(product.unit, quantity)}`);
   }
   lines.push(`• ${site.url}/products/${product.slug}`);
-  return whatsappUrl(lines.join("\n"));
+  return whatsappUrl(number, lines.join("\n"));
 }

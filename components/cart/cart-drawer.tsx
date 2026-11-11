@@ -6,6 +6,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo } from "react";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
+import { useContact } from "@/components/providers/contact-provider";
 import { Price } from "@/components/product/price";
 import { QuantityStepper } from "@/components/product/quantity-stepper";
 import { useCatalog } from "@/components/providers/catalog-provider";
@@ -22,6 +23,7 @@ import { unitLabel, whatsappUrl } from "@/lib/whatsapp";
 
 /** Slide-over mini cart: opens on add-to-cart and from every cart button. */
 export function CartDrawer() {
+  const contact = useContact();
   const { ref, isOpen, close, onClose, onBackdropClick } = useOverlayDialog("cart");
   const { products, byId, departments } = useCatalog();
   const cart = useCart();
@@ -43,7 +45,7 @@ export function CartDrawer() {
       .slice(0, 6);
   }, [cart.lines, byId, products]);
 
-  const enquiry = whatsappUrl(
+  const enquiry = whatsappUrl(contact.whatsapp,
     [
       `Hello ${site.name}, I'd like to enquire about these items:`,
       ...valid.map(

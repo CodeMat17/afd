@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import { buttonVariants } from "@/components/ui/button";
+import { getContactDetails } from "@/lib/contact-server";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { whatsappUrl } from "@/lib/whatsapp";
 
 /** Shown on a department or category that has no products online yet. */
-export function CollectionEmpty({ name }: { name: string }) {
+export async function CollectionEmpty({ name }: { name: string }) {
+  const contact = await getContactDetails();
   return (
     <div className="mx-auto flex max-w-lg flex-col items-center px-4 py-20 text-center sm:py-28">
       <span className="eyebrow text-primary">Arriving soon</span>
@@ -19,7 +21,7 @@ export function CollectionEmpty({ name }: { name: string }) {
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <a
-          href={whatsappUrl(`Hello ${site.name}, what do you have in ${name} at the moment?`)}
+          href={whatsappUrl(contact.whatsapp, `Hello ${site.name}, what do you have in ${name} at the moment?`)}
           target="_blank"
           rel="noopener noreferrer"
           className={buttonVariants({ variant: "whatsapp", size: "lg" })}

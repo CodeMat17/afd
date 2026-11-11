@@ -17,7 +17,7 @@ export default function AdminHeroPage() {
       <PageHeader
         eyebrow="Storefront"
         title="Home page hero"
-        description="The photos scrolling beside the headline at the top of the home page. They're separate from your products and only change when you save here."
+        description="The photos scrolling beside the headline at the top of the home page. Use 9–15 photos. They're separate from your products and only change when you save here."
         actions={
           <Link href="/" target="_blank" className={buttonVariants({ variant: "outline" })}>
             <ExternalLink aria-hidden="true" />

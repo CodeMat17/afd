@@ -3,6 +3,7 @@
 import {
   ExternalLink,
   GalleryHorizontalEnd,
+  Images,
   LayoutDashboard,
   LogOut,
   Package,
@@ -33,11 +34,12 @@ const NAV: NavItem[] = [
   { href: "/admin/orders", label: "Orders", short: "Orders", description: "Payments & deliveries", icon: ReceiptText },
   { href: "/admin/products", label: "Products", short: "Products", description: "Catalogue & stock", icon: Package },
   { href: "/admin/hero", label: "Home page hero", short: "Hero", description: "Photos at the top of the shop", icon: GalleryHorizontalEnd },
+  { href: "/admin/gallery", label: "Gallery", short: "Gallery", description: "Looks on the gallery page", icon: Images },
   {
     href: "/admin/settings",
-    label: "Checkout settings",
+    label: "Settings",
     short: "Settings",
-    description: "Tax & delivery fee",
+    description: "Contact details, tax & delivery",
     icon: SlidersHorizontal,
   },
 ];
@@ -187,7 +189,7 @@ function TabBar({ pathname }: { pathname: string }) {
       aria-label="Admin"
       className="fixed inset-x-0 bottom-0 z-40 border-t border-foreground/[0.07] bg-card/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
     >
-      <ul className="mx-auto grid max-w-lg grid-cols-5">
+      <ul className="mx-auto grid max-w-lg grid-cols-6">
         {NAV.map((item) => {
           const active = isActive(pathname, item.href);
           const Icon = item.icon;
@@ -203,7 +205,7 @@ function TabBar({ pathname }: { pathname: string }) {
               >
                 <span
                   className={cn(
-                    "flex h-8 w-14 items-center justify-center rounded-full transition-colors",
+                    "flex h-8 w-12 items-center justify-center rounded-full transition-colors",
                     active && "bg-primary/12",
                   )}
                 >

@@ -287,3 +287,112 @@ export function SearchBox({
     </Form>
   );
 }
+
+/** Page numbers to show: always the first, last, current and its neighbours; gaps become "…". */
+function pageWindow(page: number, pageCount: number): (number | "gap")[] {
+  const keep = new Set([1, pageCount, page - 1, page, page + 1]);
+  // Near either end, widen the window so the row keeps a steady length instead of a lone "…" for one page.
+  if (page <= 3) [2, 3, 4].forEach((n) => keep.add(n));
+  if (page >= pageCount - 2) [pageCount - 3, pageCount - 2, pageCount - 1].forEach((n) => keep.add(n));
+  const pages = [...keep].filter((n) => n >= 1 && n <= pageCount).sort((a, b) => a - b);
+  const out: (number | "gap")[] = [];
+  for (const n of pages) {
+    const prev = out[out.length - 1];
+    if (typeof prev === "number" && n - prev === 2) out.push(n - 1);
+    else if (typeof prev === "number" && n - prev > 2) out.push("gap");
+    out.push(n);
+  }
+  return out;
+}
+
+export function Pagination({
+  page,
+  pageCount,
+  pageSize,
+  total,
+  href,
+  noun = "items",
+}: {
+  page: number;
+  pageCount: number;
+  pageSize: number;
+  total: number;
+  href: (page: number) => string;
+  noun?: string;
+}) {
+  const from = (page - 1) * pageSize + 1;
+  const to = Math.min(page * pageSize, total);
+  const summary = (
+    <p className="text-sm text-muted-foreground tabular-nums" aria-live="polite">
+      Showing <span className="font-semibold text-foreground">{from.toLocaleString("en-US")}</span>–
+      <span className="font-semibold text-foreground">{to.toLocaleString("en-US")}</span> of{" "}
+      <span className="font-semibold text-foreground">{total.toLocaleString("en-US")}</span> {noun}
+    </p>
+  );
+  if (pageCount <= 1) return summary;
+
+  const step =
+    "inline-flex h-10 items-center gap-1.5 rounded-full border border-foreground/12 bg-card px-3.5 text-sm font-semibold transition-colors hover:border-foreground/40";
+  const disabled = "pointer-events-none opacity-40";
+  const num =
+    "inline-flex size-10 items-center justify-center rounded-full text-sm font-semibold tabular-nums transition-colors";
+
+  return (
+    <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
+      {summary}
+      <nav aria-label="Pagination" className="flex items-center gap-1.5">
+        {page > 1 ? (
+          <Link href={href(page - 1)} rel="prev" className={step} aria-label="Previous page">
+            <ArrowLeft className="size-4" aria-hidden="true" />
+            <span className="hidden sm:inline">Previous</span>
+          </Link>
+        ) : (
+          <span className={cn(step, disabled)} aria-hidden="true">
+            <ArrowLeft className="size-4" />
+            <span className="hidden sm:inline">Previous</span>
+          </span>
+        )}
+
+        {/* Phones: compact counter. Larger screens: numbered pages. */}
+        <span className="px-2 text-sm font-semibold tabular-nums sm:hidden">
+          {page} / {pageCount}
+        </span>
+        <ul className="hidden items-center gap-1 sm:flex">
+          {pageWindow(page, pageCount).map((n, i) =>
+            n === "gap" ? (
+              <li key={`gap-${i}`} className="w-6 text-center text-muted-foreground" aria-hidden="true">
+                …
+              </li>
+            ) : (
+              <li key={n}>
+                <Link
+                  href={href(n)}
+                  aria-label={`Page ${n}`}
+                  aria-current={n === page ? "page" : undefined}
+                  className={cn(
+                    num,
+                    n === page ? "bg-foreground text-background" : "hover:bg-muted",
+                  )}
+                >
+                  {n}
+                </Link>
+              </li>
+            ),
+          )}
+        </ul>
+
+        {page < pageCount ? (
+          <Link href={href(page + 1)} rel="next" className={step} aria-label="Next page">
+            <span className="hidden sm:inline">Next</span>
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        ) : (
+          <span className={cn(step, disabled)} aria-hidden="true">
+            <span className="hidden sm:inline">Next</span>
+            <ArrowRight className="size-4" />
+          </span>
+        )}
+      </nav>
+    </div>
+  );
+}

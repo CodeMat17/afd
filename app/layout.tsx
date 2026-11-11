@@ -7,8 +7,10 @@ import { Header } from "@/components/layout/header";
 import { CartDrawer } from "@/components/cart/cart-drawer";
 import { Providers } from "@/components/providers";
 import { CatalogProvider } from "@/components/providers/catalog-provider";
+import { ContactProvider } from "@/components/providers/contact-provider";
 import { SearchDialog } from "@/components/search/search-dialog";
 import { flattenCategories } from "@/lib/catalog-tree";
+import { getContactDetails } from "@/lib/contact-server";
 import { catalog, getCatalogTree } from "@/lib/repository";
 import { site } from "@/lib/site";
 import "./globals.css";
@@ -55,7 +57,11 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const [departments, products] = await Promise.all([getCatalogTree(), catalog.getProducts()]);
+  const [departments, products, contact] = await Promise.all([
+    getCatalogTree(),
+    catalog.getProducts(),
+    getContactDetails(),
+  ]);
 
   return (
     <html lang="en-KE" className={`${manrope.variable} ${cormorant.variable} antialiased`} suppressHydrationWarning>
@@ -67,22 +73,24 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         <Providers>
-          <CatalogProvider products={products} departments={departments} categories={flattenCategories(departments)}>
-            {/* <AnnouncementBar /> */}
-            {/* `data-site-chrome` is hidden inside the admin (see globals.css). */}
-            <div data-site-chrome="" className="contents">
-              <Header departments={departments} />
-            </div>
-            <main id="main" className="flex-1">
-              {children}
-            </main>
-            <div data-site-chrome="" className="contents">
-              <Footer departments={departments} />
-              <FloatingCart />
-            </div>
-            <CartDrawer />
-            <SearchDialog />
-          </CatalogProvider>
+          <ContactProvider value={contact}>
+            <CatalogProvider products={products} departments={departments} categories={flattenCategories(departments)}>
+              {/* <AnnouncementBar /> */}
+              {/* `data-site-chrome` is hidden inside the admin (see globals.css). */}
+              <div data-site-chrome="" className="contents">
+                <Header departments={departments} />
+              </div>
+              <main id="main" className="flex-1">
+                {children}
+              </main>
+              <div data-site-chrome="" className="contents">
+                <Footer departments={departments} contact={contact} />
+                <FloatingCart />
+              </div>
+              <CartDrawer />
+              <SearchDialog />
+            </CatalogProvider>
+          </ContactProvider>
         </Providers>
       </body>
     </html>

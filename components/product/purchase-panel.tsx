@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
+import { useContact } from "@/components/providers/contact-provider";
 import { QuantityStepper } from "@/components/product/quantity-stepper";
 import { SaveButton } from "@/components/product/save-button";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { productEnquiryUrl, unitLabel } from "@/lib/whatsapp";
 
 export function PurchasePanel({ product }: { product: Product }) {
+  const contact = useContact();
   const [quantity, setQuantity] = useState(product.minimumQuantity);
   const units = unitLabel(product.unit, quantity);
   const actionsRef = useRef<HTMLDivElement>(null);
@@ -82,7 +84,7 @@ export function PurchasePanel({ product }: { product: Product }) {
           />
         </div>
         <a
-          href={productEnquiryUrl(product, quantity)}
+          href={productEnquiryUrl(contact.whatsapp, product, quantity)}
           target="_blank"
           rel="noopener noreferrer"
           className={cn(buttonVariants({ variant: "whatsapp", size: "lg" }), "w-full")}

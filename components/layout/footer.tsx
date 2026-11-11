@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import type { NavDepartment } from "@/lib/catalog-tree";
+import { telHref, type ContactDetails } from "@/lib/contact";
 import { policyNav, primaryNav, site } from "@/lib/site";
 import { whatsappUrl } from "@/lib/whatsapp";
 
@@ -14,7 +15,7 @@ async function CopyrightYear() {
   return <>{new Date().getFullYear()}</>;
 }
 
-export function Footer({ departments }: { departments: NavDepartment[] }) {
+export function Footer({ departments, contact }: { departments: NavDepartment[]; contact: ContactDetails }) {
   return (
     <footer className="grain relative overflow-hidden bg-band text-band-foreground">
       {/* Oversized wordmark */}
@@ -41,7 +42,7 @@ export function Footer({ departments }: { departments: NavDepartment[] }) {
             {site.address.street}, {site.address.city}, {site.address.country}
           </p>
           <a
-            href={whatsappUrl(`Hello ${site.name}`)}
+            href={whatsappUrl(contact.whatsapp, `Hello ${site.name}`)}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-6 inline-flex h-11 items-center gap-2 rounded-full border border-band-foreground/25 px-5 text-sm font-semibold transition-colors hover:border-whatsapp hover:bg-whatsapp"
@@ -74,18 +75,18 @@ export function Footer({ departments }: { departments: NavDepartment[] }) {
 
         <FooterColumn title="Contact">
           <li>
-            <a href={site.phone.href} className="flex min-h-10 items-center gap-3 hover:text-primary">
+            <a href={telHref(contact.phone)} className="flex min-h-10 items-center gap-3 hover:text-primary">
               <Phone className="size-4 shrink-0 text-gold" aria-hidden="true" />
-              {site.phone.display}
+              {contact.phone}
             </a>
           </li>
           <li>
             <a
-              href={`mailto:${site.email}`}
+              href={`mailto:${contact.email}`}
               className="flex min-h-10 items-center gap-3 break-all hover:text-primary"
             >
               <Mail className="size-4 shrink-0 text-gold" aria-hidden="true" />
-              {site.email}
+              {contact.email}
             </a>
           </li>
           <li>

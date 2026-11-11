@@ -11,6 +11,8 @@ import { createHash } from "node:crypto";
 export const PRODUCT_FOLDER = "afd/products";
 /** Home page hero photos, uploaded from /admin/hero. */
 export const HERO_FOLDER = "afd/hero";
+/** Gallery and home page editorial photos, uploaded from /admin/gallery. */
+export const GALLERY_FOLDER = "afd/gallery";
 
 /** Applied on upload so phone-camera originals aren't stored at full size. */
 const INCOMING_TRANSFORMATION = "c_limit,w_2400,h_2400";

@@ -1,26 +1,38 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { SettingsForm } from "@/components/admin/admin-forms";
+import { ContactDetailsForm, SettingsForm } from "@/components/admin/admin-forms";
 import { PageHeader, PanelSkeleton } from "@/components/admin/ui";
 import { requireAdmin } from "@/lib/admin/session";
 import { centsToAmount } from "@/lib/checkout/pricing";
 import { getCheckoutSettings } from "@/lib/checkout/settings";
+import { getContactDetails } from "@/lib/contact-server";
 
-export const metadata: Metadata = { title: "Checkout settings" };
+export const metadata: Metadata = { title: "Settings" };
 
 export default function AdminSettingsPage() {
   return (
     <>
       <PageHeader
         eyebrow="Settings"
-        title="Checkout settings"
-        description="The delivery fee and tax rate your customers are charged at checkout."
+        title="Shop settings"
+        description="How customers reach you, and the delivery fee and tax rate they're charged at checkout."
       />
-      <Suspense fallback={<PanelSkeleton className="h-[32rem]" />}>
-        <Settings />
-      </Suspense>
+      <div className="space-y-12">
+        <Suspense fallback={<PanelSkeleton className="h-[26rem]" />}>
+          <Contact />
+        </Suspense>
+        <Suspense fallback={<PanelSkeleton className="h-[32rem]" />}>
+          <Settings />
+        </Suspense>
+      </div>
     </>
   );
+}
+
+async function Contact() {
+  await requireAdmin("/admin/settings");
+  const contact = await getContactDetails();
+  return <ContactDetailsForm contact={contact} />;
 }
 
 async function Settings() {

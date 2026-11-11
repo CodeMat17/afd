@@ -224,6 +224,20 @@ export default defineSchema({
     updatedAt: v.number(),
   }).index("by_key", ["key"]),
 
+  /**
+   * Single row (key "site"): the showroom's phone, WhatsApp and email, edited
+   * from /admin/settings and shown everywhere on the storefront.
+   */
+  contact: defineTable({
+    key: v.literal("site"),
+    /** As displayed, e.g. "+254 710 660 524". */
+    phone: v.string(),
+    /** As displayed; links use the digits only. */
+    whatsapp: v.string(),
+    email: v.string(),
+    updatedAt: v.number(),
+  }).index("by_key", ["key"]),
+
   /** Single row (key "checkout") edited from /admin/settings. */
   settings: defineTable({
     key: v.literal("checkout"),

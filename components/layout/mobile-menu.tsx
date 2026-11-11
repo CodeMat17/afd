@@ -4,12 +4,14 @@ import { ArrowUpRight, Heart, Mail, MapPin, Phone, Search, User, X } from "lucid
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
+import { useContact } from "@/components/providers/contact-provider";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { CategoryImage } from "@/components/ui/category-image";
 import type { NavDepartment } from "@/lib/catalog-tree";
 import { primaryNav, site } from "@/lib/site";
 import { overlay } from "@/lib/ui-store";
 import { useDialog } from "@/lib/use-dialog";
+import { telHref } from "@/lib/contact";
 import { whatsappUrl } from "@/lib/whatsapp";
 
 export function MobileMenu({
@@ -19,6 +21,7 @@ export function MobileMenu({
   departments: NavDepartment[];
   trigger: ReactNode;
 }) {
+  const contact = useContact();
   const { ref, isOpen, open, close, onClose } = useDialog();
 
   return (
@@ -129,14 +132,14 @@ export function MobileMenu({
             <Link href="/saved" onClick={close} className="flex min-h-11 items-center gap-3">
               <Heart className="size-4" aria-hidden="true" /> Saved items
             </Link>
-            <a href={site.phone.href} className="flex min-h-11 items-center gap-3">
-              <Phone className="size-4" aria-hidden="true" /> {site.phone.display}
+            <a href={telHref(contact.phone)} className="flex min-h-11 items-center gap-3">
+              <Phone className="size-4" aria-hidden="true" /> {contact.phone}
             </a>
-            <a href={`mailto:${site.email}`} className="flex min-h-11 items-center gap-3 break-all">
-              <Mail className="size-4 shrink-0" aria-hidden="true" /> {site.email}
+            <a href={`mailto:${contact.email}`} className="flex min-h-11 items-center gap-3 break-all">
+              <Mail className="size-4 shrink-0" aria-hidden="true" /> {contact.email}
             </a>
             <a
-              href={whatsappUrl(`Hello ${site.name}`)}
+              href={whatsappUrl(contact.whatsapp, `Hello ${site.name}`)}
               target="_blank"
               rel="noopener noreferrer"
               className="flex min-h-11 items-center gap-3 text-whatsapp"

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Container, PageHeader, PreviewNotice } from "@/components/ui/section";
-import { site } from "@/lib/site";
+import { getContactDetails } from "@/lib/contact-server";
 
 export interface DraftSection {
   title: string;
@@ -9,7 +9,7 @@ export interface DraftSection {
 }
 
 /** Placeholder for policy pages until approved copy is supplied. */
-export function DraftDocument({
+export async function DraftDocument({
   eyebrow,
   title,
   intro,
@@ -22,6 +22,7 @@ export function DraftDocument({
   reviewer: string;
   sections: DraftSection[];
 }) {
+  const contact = await getContactDetails();
   return (
     <>
       <PageHeader eyebrow={eyebrow} title={title} description={intro} />
@@ -62,8 +63,8 @@ export function DraftDocument({
           </ol>
           <p className="mt-12 border-t pt-8 text-sm text-muted-foreground">
             Questions in the meantime? Email{" "}
-            <a href={`mailto:${site.email}`} className="font-semibold text-foreground underline underline-offset-4">
-              {site.email}
+            <a href={`mailto:${contact.email}`} className="font-semibold text-foreground underline underline-offset-4">
+              {contact.email}
             </a>{" "}
             or visit the{" "}
             <Link href="/contact" className="font-semibold text-foreground underline underline-offset-4">

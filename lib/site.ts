@@ -11,12 +11,7 @@ export const site = {
     city: "Nairobi",
     country: "Kenya",
   },
-  phone: {
-    display: "+254 710 660 524",
-    href: "tel:+254710660524",
-    whatsapp: "254710660524",
-  },
-  email: "sales@africanfabricanddesigns.com",
+  // Phone, WhatsApp and email are managed in /admin/settings — see lib/contact.ts.
   currency: "USD" as const,
   maps: {
     url: "https://www.google.com/maps/place/African+Fabric+And+Designs+Kenya+Ltd./@-1.294248,36.7911309,17z/",

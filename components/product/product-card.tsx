@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
+import { useContact } from "@/components/providers/contact-provider";
 import { Price } from "@/components/product/price";
 import { Badge } from "@/components/ui/badge";
 import { SaveButton } from "@/components/product/save-button";
@@ -22,6 +23,7 @@ export function ProductCard({
   categoryName?: string;
   priority?: boolean;
 }) {
+  const contact = useContact();
   const image = product.images.find((i) => i.isPrimary) ?? product.images[0];
   const href = `/products/${product.slug}`;
 
@@ -105,7 +107,7 @@ export function ProductCard({
             <TooltipTrigger
               render={
                 <a
-                  href={productEnquiryUrl(product)}
+                  href={productEnquiryUrl(contact.whatsapp, product)}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`WhatsApp enquiry: ${product.name} (opens in a new tab)`}

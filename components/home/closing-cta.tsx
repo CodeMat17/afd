@@ -4,11 +4,13 @@ import Link from "next/link";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import { Reveal } from "@/components/motion/reveal";
 import { buttonVariants } from "@/components/ui/button";
+import { getContactDetails } from "@/lib/contact-server";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { whatsappUrl } from "@/lib/whatsapp";
 
-export function ClosingCta({ image }: { image: { src: string; alt: string } }) {
+export async function ClosingCta({ image }: { image: { src: string; alt: string } }) {
+  const contact = await getContactDetails();
   return (
     <section aria-labelledby="closing-title" className="relative isolate overflow-hidden bg-band text-band-foreground">
       <div className="absolute inset-0 -z-10">
@@ -37,7 +39,7 @@ export function ClosingCta({ image }: { image: { src: string; alt: string } }) {
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
             </Link>
             <a
-              href={whatsappUrl(`Hello ${site.name}, I'm looking for fabric for an occasion.`)}
+              href={whatsappUrl(contact.whatsapp, `Hello ${site.name}, I'm looking for fabric for an occasion.`)}
               target="_blank"
               rel="noopener noreferrer"
               className={buttonVariants({ variant: "outline-inverse", size: "lg" })}

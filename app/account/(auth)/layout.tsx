@@ -15,7 +15,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         />
         <div className="absolute inset-0 bg-linear-to-t from-ink via-ink/20 to-transparent" />
         <p className="absolute right-12 bottom-12 left-12 font-heading text-5xl leading-[0.95] text-ink-foreground">
-          Your fabrics, <em className="text-gold">saved for later.</em>
+          Your favourites, <em className="text-gold">saved for later.</em>
         </p>
       </div>
       <div className="flex items-center justify-center px-4 py-14 sm:px-6 lg:px-16">

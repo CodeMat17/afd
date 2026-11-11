@@ -20,7 +20,7 @@ export function productEnquiryUrl(
   quantity?: string,
 ): string {
   const lines = [
-    `Hello ${site.name}, I'd like to ask about this fabric:`,
+    `Hello ${site.name}, I'd like to ask about this item:`,
     `• ${product.name}`,
     `• SKU: ${product.sku}`,
   ];

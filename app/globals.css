@@ -219,6 +219,11 @@
   dialog::backdrop {
     background: rgb(20 16 13 / 0.82);
   }
+  /* The admin has its own frame: hide the storefront header, footer and cart. */
+  body:has([data-admin-root]) [data-site-chrome] {
+    /* !important: beats the `contents` utility, which sits in a later layer. */
+    display: none !important;
+  }
   /* Prevent background scroll when a modal is open */
   html:has(dialog[open]:modal) {
     overflow: hidden;

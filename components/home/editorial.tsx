@@ -9,16 +9,20 @@ import { Container } from "@/components/ui/section";
 
 const pillars = [
   {
-    title: "Printed",
-    body: "Ankara in every register — graphic monochromes, botanicals, and prints finished with sequins.",
+    title: "Fabrics",
+    body: "Printed Ankara and sequin Ankara, woven Kente, plush Isiagu and stone-set lace — by the piece.",
   },
   {
-    title: "Woven",
-    body: "Woven Kente cloths, many shown with coordinating folded pieces, shot through with metallic thread.",
+    title: "Clothing",
+    body: "Ready-to-wear womenswear and menswear cut from the same prints, lace and woven cloth.",
   },
   {
-    title: "Embellished",
-    body: "Stone-set lace, beaded tulle and plush Isiagu for the occasions that call for ceremony.",
+    title: "Headwear & wraps",
+    body: "Auto gele, turbans and ipele to crown the look and finish it with ceremony.",
+  },
+  {
+    title: "Accessories",
+    body: "Beads and finishing pieces chosen to sit alongside the cloth, colour for colour.",
   },
 ];
 
@@ -76,9 +80,9 @@ export function Editorial({
               Pattern is a language. <em className="text-primary">Colour</em> is a celebration.
             </h2>
             <p className="mt-6 max-w-lg text-[0.9375rem] leading-relaxed text-muted-foreground sm:text-base">
-              African Fabric and Designs brings printed, woven and embellished
-              textiles together under one roof on Marcus Garvey Road, Nairobi —
-              from everyday Ankara to ceremonial Kente, Isiagu and stone-set lace.
+              African Fabric and Designs brings everything for the occasion together
+              under one roof on Marcus Garvey Road, Nairobi — the fabric, the
+              finished outfit, the headwear and the beads to match.
             </p>
           </Reveal>
 

@@ -23,9 +23,11 @@ export function Price({
       >
         {formatPrice(product.price)}
       </span>
-      <span className={cn("text-muted-foreground", size === "lg" ? "text-sm" : "text-xs")}>
-        / {product.unit}
-      </span>
+      {product.unit !== "piece" ? (
+        <span className={cn("text-muted-foreground", size === "lg" ? "text-sm" : "text-xs")}>
+          / {product.unit}
+        </span>
+      ) : null}
     </p>
   );
 }

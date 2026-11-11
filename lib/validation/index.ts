@@ -31,15 +31,31 @@ export const checkoutSchema = z
       .trim()
       .min(1, "Phone is required.")
       .regex(phonePattern, "Enter a valid phone number, including country code."),
-    addressLine1: requiredText("Address", 3, 160),
+    fulfilment: z.enum(["pickup", "delivery"], "Choose pickup or delivery."),
+    // Address fields are only required for delivery; see superRefine below.
+    addressLine1: optionalText(160),
     addressLine2: optionalText(160),
-    city: requiredText("City"),
+    city: optionalText(),
     region: optionalText(),
     postalCode: optionalText(20),
-    country: requiredText("Country"),
+    country: optionalText(),
     notes: optionalText(1000),
     readyToPayApplicableTaxes: z.boolean(),
     taxId: z.string().trim().max(40, "Tax ID is too long.").optional().or(z.literal("")),
+  })
+  .superRefine((data, ctx) => {
+    if (data.fulfilment !== "delivery") return;
+    const required = [
+      ["addressLine1", requiredText("Address", 3, 160)],
+      ["city", requiredText("City")],
+      ["country", requiredText("Country")],
+    ] as const;
+    for (const [field, schema] of required) {
+      const result = schema.safeParse(data[field] ?? "");
+      if (!result.success) {
+        ctx.addIssue({ code: "custom", path: [field], message: result.error.issues[0].message });
+      }
+    }
   })
   .refine(
     (data) =>

@@ -4,35 +4,27 @@ import { ArrowRight, ShoppingBag, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import { QuantityStepper } from "@/components/product/quantity-stepper";
 import { buttonVariants } from "@/components/ui/button";
 import { PreviewNotice } from "@/components/ui/section";
-import { useCart } from "@/lib/cart/use-cart";
+import { cartLineImage, useCart } from "@/lib/cart/use-cart";
 import { formatCents, formatPrice, lineTotalCents, sumCents } from "@/lib/money";
 import { site } from "@/lib/site";
 import type { Product } from "@/lib/types";
-import { useHydrated } from "@/lib/use-hydrated";
 import { cn } from "@/lib/utils";
 import { unitLabel, whatsappUrl } from "@/lib/whatsapp";
 
 export function CartView({ products }: { products: Product[] }) {
-  const hydrated = useHydrated();
   const cart = useCart();
-  const { reconcile } = cart;
   const byId = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
 
-  // Refresh prices/names from the catalogue; local snapshots are never authoritative.
-  useEffect(() => {
-    reconcile(products);
-  }, [products, reconcile]);
-
   const valid = cart.lines.filter((l) => byId.get(l.productId)?.isAvailable);
-  const subtotal = sumCents(valid.map((l) => lineTotalCents(l.snapshot.price, l.quantity)));
+  const subtotal = sumCents(valid.map((l) => lineTotalCents(l.product.price, l.quantity)));
   const hasUnavailable = valid.length !== cart.lines.length;
 
-  if (!hydrated) {
+  if (!cart.ready) {
     return (
       <div className="grid gap-10 lg:grid-cols-[1fr_24rem]" aria-busy="true">
         <div className="space-y-4">
@@ -53,7 +45,7 @@ export function CartView({ products }: { products: Product[] }) {
         </span>
         <h2 className="mt-6 font-heading text-4xl">Your cart is empty</h2>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          Explore printed, woven and embellished fabrics — add anything you like and it will wait here.
+          Explore fabrics, ready-to-wear and accessories — add anything you like and it will wait here.
         </p>
         <Link href="/shop" className={cn(buttonVariants({ size: "lg" }), "mt-8")}>
           Shop the collection
@@ -68,7 +60,7 @@ export function CartView({ products }: { products: Product[] }) {
       `Hello ${site.name}, I'd like to enquire about these items:`,
       ...valid.map(
         (l) =>
-          `• ${l.snapshot.name} (SKU ${l.snapshot.sku}) — ${l.quantity} ${unitLabel(l.snapshot.unit, l.quantity)}`,
+          `• ${l.product.name} (SKU ${l.product.sku}) — ${l.quantity} ${unitLabel(l.product.unit, l.quantity)}`,
       ),
     ].join("\n"),
   );
@@ -84,7 +76,8 @@ export function CartView({ products }: { products: Product[] }) {
             {cart.lines.map((line) => {
               const product = byId.get(line.productId);
               const unavailable = !product || !product.isAvailable;
-              const total = lineTotalCents(line.snapshot.price, line.quantity);
+              const image = cartLineImage(line.product);
+              const total = lineTotalCents(line.product.price, line.quantity);
               return (
                 <motion.li
                   key={line.productId}
@@ -97,25 +90,25 @@ export function CartView({ products }: { products: Product[] }) {
                 >
                   <div className="grid grid-cols-[5.5rem_1fr] gap-4 py-6 sm:grid-cols-[7rem_1fr] sm:gap-6">
                     <Link
-                      href={`/products/${line.snapshot.slug}`}
+                      href={`/products/${line.product.slug}`}
                       tabIndex={-1}
                       aria-hidden="true"
                       className="relative aspect-17/23 overflow-hidden rounded-xl bg-muted ring-1 ring-foreground/5"
                     >
-                      {line.snapshot.imageUrl ? (
-                        <Image src={line.snapshot.imageUrl} alt="" fill sizes="112px" className="object-cover" />
+                      {image ? (
+                        <Image src={image.imageUrl} alt="" fill sizes="112px" className="object-cover" />
                       ) : null}
                     </Link>
                     <div className="flex min-w-0 flex-col">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <h3 className="font-heading text-xl leading-tight sm:text-2xl">
-                            <Link href={`/products/${line.snapshot.slug}`} className="hover:text-primary">
-                              {line.snapshot.name}
+                            <Link href={`/products/${line.product.slug}`} className="hover:text-primary">
+                              {line.product.name}
                             </Link>
                           </h3>
                           <p className="mt-1 text-xs text-muted-foreground">
-                            SKU {line.snapshot.sku} · {formatPrice(line.snapshot.price)} / {line.snapshot.unit}
+                            SKU {line.product.sku} · {formatPrice(line.product.price)} / {line.product.unit}
                           </p>
                         </div>
                         <p className="shrink-0 text-right font-semibold tabular-nums">{formatCents(total)}</p>
@@ -133,11 +126,11 @@ export function CartView({ products }: { products: Product[] }) {
                           <QuantityStepper
                             id={`cart-qty-${line.productId}`}
                             value={line.quantity}
-                            minimum={line.snapshot.minimumQuantity}
-                            step={line.snapshot.quantityStep}
-                            unitLabel={unitLabel(line.snapshot.unit, "2")}
-                            label={`Quantity of ${line.snapshot.name}`}
-                            onChange={(q) => cart.setQuantity(line.productId, q)}
+                            minimum={line.product.minimumQuantity}
+                            step={line.product.quantityStep}
+                            unitLabel={unitLabel(line.product.unit, "2")}
+                            label={`Quantity of ${line.product.name}`}
+                            onChange={(q) => cart.setQuantity(line.product, q)}
                             size="sm"
                           />
                         ) : (
@@ -149,7 +142,7 @@ export function CartView({ products }: { products: Product[] }) {
                           className="inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                         >
                           <Trash2 className="size-4" aria-hidden="true" />
-                          Remove<span className="sr-only"> {line.snapshot.name}</span>
+                          Remove<span className="sr-only"> {line.product.name}</span>
                         </button>
                       </div>
                     </div>
@@ -214,9 +207,8 @@ export function CartView({ products }: { products: Product[] }) {
             <p className="mt-4 text-xs text-destructive">Unavailable items are excluded from the total.</p>
           ) : null}
         </div>
-        <PreviewNotice className="mt-4" title="Your cart is saved on this device">
-          It&apos;s stored in this browser only, and isn&apos;t a reservation or an order.
-          Prices are confirmed at checkout once ordering opens.
+        <PreviewNotice className="mt-4" title="Your cart isn't a reservation">
+          Items aren&apos;t held until you pay. Prices and stock are checked again at checkout.
         </PreviewNotice>
       </aside>
     </div>

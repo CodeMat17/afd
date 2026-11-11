@@ -4,19 +4,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { Reveal, RevealImage } from "@/components/motion/reveal";
 import { buttonVariants } from "@/components/ui/button";
-import { Container, PageHeader, PreviewNotice } from "@/components/ui/section";
-import { catalog } from "@/lib/repository";
+import { CategoryImage } from "@/components/ui/category-image";
+import { Container, PageHeader } from "@/components/ui/section";
+import { getCatalogTree } from "@/lib/repository";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "About",
-  description: `${site.legalName} — a textile showroom on ${site.address.street}, ${site.address.city}.`,
+  description: `${site.legalName} — a showroom for African fabrics, clothing and accessories on ${site.address.street}, ${site.address.city}.`,
   alternates: { canonical: "/about" },
 };
 
 export default async function AboutPage() {
-  const categories = await catalog.getCategories();
+  const departments = await getCatalogTree();
 
   return (
     <>
@@ -24,7 +25,7 @@ export default async function AboutPage() {
         eyebrow="Our story"
         title={
           <>
-            A showroom for <em className="text-primary">African cloth</em>
+            A showroom for <em className="text-primary">the whole occasion</em>
           </>
         }
         description={`${site.legalName} — on ${site.address.street}, ${site.address.city}.`}
@@ -47,43 +48,51 @@ export default async function AboutPage() {
       <Container className="grid gap-12 py-20 lg:grid-cols-[1fr_1.2fr] lg:gap-24 lg:py-28">
         <Reveal>
           <p className="font-heading text-4xl leading-[1.05] sm:text-5xl">
-            Printed, woven and embellished — <em className="text-primary">under one roof.</em>
+            From the fabric to the crown — <em className="text-primary">under one roof.</em>
           </p>
         </Reveal>
         <Reveal delay={0.1} className="space-y-5 text-[0.9375rem] leading-relaxed text-muted-foreground sm:text-base">
-          <PreviewNotice title="Draft brand story">
-            This page will carry the business&apos;s own history and voice. The text below sticks to
-            what is confirmed: the showroom location and the fabrics it carries.
-          </PreviewNotice>
-          <p>
-            From the showroom on {site.address.street} in {site.address.city}, {site.name} offers{" "}
-            {categories.map((c) => c.name).join(", ").replace(/, ([^,]*)$/, " and $1")}.
+          <p className="text-foreground">
+            Every celebration has a moment when someone walks in and the whole room turns. A
+            wedding, an introduction, a graduation, a Sunday thanksgiving — across Africa and its
+            diaspora, these are days we dress for. {site.name} exists for that moment, and for
+            everything it takes to get there.
           </p>
           <p>
-            The collection spans bold everyday prints, strip-woven Kente shown with coordinating
-            pieces, plush Isiagu with lion and crown motifs, and stone-set lace and beaded tulle for
-            ceremonies.
+            African cloth has never been just fabric. Its patterns speak of family, standing and
+            celebration; its colours are chosen with intention. We carry that respect into every
+            design on our shelves — bold everyday Ankara, strip-woven Kente shown with coordinating
+            pieces, plush Isiagu with its lion and crown motifs, and stone-set lace and beaded tulle
+            for the biggest occasions.
+          </p>
+          <p>
+            But an outfit is more than its cloth, so we don&apos;t stop there. Our showroom on{" "}
+            {site.address.street} in {site.address.city} brings the whole look under one roof:
+            ready-to-wear pieces for women and men, auto gele and turbans that are ready the moment
+            you are, ipele for the shoulder and beads for the neck and wrist. Come in, feel the
+            fabric, hold it to the light and match it with a gele before you leave.
+          </p>
+          <p>
+            Can&apos;t make it to Nairobi? Browse the collection here and send us your list on
+            WhatsApp — we&apos;ll help you put the look together, from the fabric to the crown.
           </p>
         </Reveal>
       </Container>
 
       <section className="border-t bg-surface py-20 lg:py-28">
         <Container>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            {categories.map((c, i) => (
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {departments.map((c, i) => (
               <li key={c.id}>
                 <Reveal delay={i * 0.06}>
                   <Link href={`/shop/${c.slug}`} className="group block">
                     <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-muted">
-                      {c.imageUrl ? (
-                        <Image
-                          src={c.imageUrl}
-                          alt=""
-                          fill
-                          sizes="(min-width: 1024px) 20vw, 50vw"
-                          className="object-cover transition-transform duration-[1.4s] ease-silk group-hover:scale-105"
-                        />
-                      ) : null}
+                      <CategoryImage
+                        src={c.imageUrl}
+                        name={c.name}
+                        sizes="(min-width: 1024px) 25vw, 50vw"
+                        className="transition-transform duration-[1.4s] ease-silk group-hover:scale-105"
+                      />
                     </div>
                     <p className="mt-3 font-heading text-2xl">{c.name}</p>
                     <p className="text-xs text-muted-foreground">{c.tagline}</p>

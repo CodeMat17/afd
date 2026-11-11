@@ -7,13 +7,19 @@ import { motion, useReducedMotion, useScroll, useTransform } from "motion/react"
 import { useLayoutEffect, useRef, useState } from "react";
 import { useMediaQuery } from "@/lib/use-media-query";
 import type { GalleryImage } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn, formatList } from "@/lib/utils";
 
 /**
  * Gallery preview. On large screens with motion allowed, vertical scroll
  * drives a pinned horizontal film reel; elsewhere it is a swipeable rail.
  */
-export function GalleryReel({ images }: { images: GalleryImage[] }) {
+export function GalleryReel({
+  images,
+  departmentNames,
+}: {
+  images: GalleryImage[];
+  departmentNames: string[];
+}) {
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
@@ -65,7 +71,8 @@ export function GalleryReel({ images }: { images: GalleryImage[] }) {
                 Through <em className="text-gold">the lens</em>
               </h2>
               <p className="mt-5 max-w-xs text-sm leading-relaxed text-band-muted">
-                Texture, sheen and scale — the fabrics up close, as photographed in the showroom.
+                Texture, colour and craft — {formatList(departmentNames).toLowerCase()} up close, as
+                photographed in the showroom.
               </p>
             </div>
             <Link

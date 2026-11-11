@@ -4,14 +4,15 @@ import { ArrowRight, Check, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import { Price } from "@/components/product/price";
 import { QuantityStepper } from "@/components/product/quantity-stepper";
 import { useCatalog } from "@/components/providers/catalog-provider";
 import { buttonVariants } from "@/components/ui/button";
+import { CategoryImage } from "@/components/ui/category-image";
 import { cartActions } from "@/lib/cart/store";
-import { useCart } from "@/lib/cart/use-cart";
+import { cartLineImage, useCart } from "@/lib/cart/use-cart";
 import { formatCents, lineTotalCents, sumCents } from "@/lib/money";
 import { site } from "@/lib/site";
 import { useLastAdded } from "@/lib/ui-store";
@@ -22,20 +23,15 @@ import { unitLabel, whatsappUrl } from "@/lib/whatsapp";
 /** Slide-over mini cart: opens on add-to-cart and from every cart button. */
 export function CartDrawer() {
   const { ref, isOpen, close, onClose, onBackdropClick } = useOverlayDialog("cart");
-  const { products, byId, categories } = useCatalog();
+  const { products, byId, departments } = useCatalog();
   const cart = useCart();
   const lastAdded = useLastAdded();
 
-  // Local snapshots are never authoritative: refresh from the catalogue.
-  useEffect(() => {
-    cartActions.reconcile(products);
-  }, [products]);
-
   const valid = cart.lines.filter((l) => byId.get(l.productId)?.isAvailable);
-  const subtotal = sumCents(valid.map((l) => lineTotalCents(l.snapshot.price, l.quantity)));
+  const subtotal = sumCents(valid.map((l) => lineTotalCents(l.product.price, l.quantity)));
   const justAdded = lastAdded ? cart.lines.find((l) => l.productId === lastAdded) : undefined;
 
-  // Pair-with suggestions: same fabric families as the cart, not already in it.
+  // Pair-with suggestions: same categories as the cart, not already in it.
   const suggestions = useMemo(() => {
     const inCart = new Set(cart.lines.map((l) => l.productId));
     const families = new Set(
@@ -52,7 +48,7 @@ export function CartDrawer() {
       `Hello ${site.name}, I'd like to enquire about these items:`,
       ...valid.map(
         (l) =>
-          `• ${l.snapshot.name} (SKU ${l.snapshot.sku}) — ${l.quantity} ${unitLabel(l.snapshot.unit, l.quantity)}`,
+          `• ${l.product.name} (SKU ${l.product.sku}) — ${l.quantity} ${unitLabel(l.product.unit, l.quantity)}`,
       ),
     ].join("\n"),
   );
@@ -94,12 +90,12 @@ export function CartDrawer() {
             className="flex items-center gap-2 border-b bg-olive/10 px-5 py-3 text-sm font-medium text-olive dark:text-secondary"
           >
             <Check className="size-4 shrink-0" aria-hidden="true" />
-            <span className="truncate">Added {justAdded.snapshot.name}</span>
+            <span className="truncate">Added {justAdded.product.name}</span>
           </motion.p>
         ) : null}
 
         {cart.lines.length === 0 ? (
-          <EmptyDrawer categories={categories} onNavigate={close} />
+          <EmptyDrawer departments={departments} onNavigate={close} />
         ) : (
           <>
             <div className="flex-1 overflow-y-auto overscroll-contain">
@@ -108,6 +104,7 @@ export function CartDrawer() {
                   {cart.lines.map((line) => {
                     const product = byId.get(line.productId);
                     const unavailable = !product || !product.isAvailable;
+                    const image = cartLineImage(line.product);
                     return (
                       <motion.li
                         key={line.productId}
@@ -118,30 +115,30 @@ export function CartDrawer() {
                       >
                         <div className="grid grid-cols-[4.5rem_1fr] gap-4 py-5">
                           <Link
-                            href={`/products/${line.snapshot.slug}`}
+                            href={`/products/${line.product.slug}`}
                             onClick={close}
                             tabIndex={-1}
                             aria-hidden="true"
                             className="relative aspect-17/23 overflow-hidden rounded-lg bg-muted"
                           >
-                            {line.snapshot.imageUrl ? (
-                              <Image src={line.snapshot.imageUrl} alt="" fill sizes="72px" className="object-cover" />
+                            {image ? (
+                              <Image src={image.imageUrl} alt="" fill sizes="72px" className="object-cover" />
                             ) : null}
                           </Link>
                           <div className="min-w-0">
                             <div className="flex items-start justify-between gap-3">
                               <Link
-                                href={`/products/${line.snapshot.slug}`}
+                                href={`/products/${line.product.slug}`}
                                 onClick={close}
                                 className="line-clamp-2 font-heading text-lg leading-tight hover:text-primary"
                               >
-                                {line.snapshot.name}
+                                {line.product.name}
                               </Link>
                               <p className="shrink-0 text-sm font-semibold tabular-nums">
-                                {formatCents(lineTotalCents(line.snapshot.price, line.quantity))}
+                                {formatCents(lineTotalCents(line.product.price, line.quantity))}
                               </p>
                             </div>
-                            <Price product={line.snapshot} className="mt-0.5 [&>span:first-child]:text-xs [&>span:first-child]:font-normal [&>span:first-child]:text-muted-foreground" />
+                            <Price product={line.product} className="mt-0.5 [&>span:first-child]:text-xs [&>span:first-child]:font-normal [&>span:first-child]:text-muted-foreground" />
                             {unavailable ? (
                               <p className="mt-2 text-xs font-medium text-destructive">
                                 {product ? "Sold out" : "No longer available"} — won&apos;t be included at checkout.
@@ -152,11 +149,11 @@ export function CartDrawer() {
                                 <QuantityStepper
                                   id={`drawer-qty-${line.productId}`}
                                   value={line.quantity}
-                                  minimum={line.snapshot.minimumQuantity}
-                                  step={line.snapshot.quantityStep}
-                                  unitLabel={unitLabel(line.snapshot.unit, "2")}
-                                  label={`Quantity of ${line.snapshot.name}`}
-                                  onChange={(q) => cart.setQuantity(line.productId, q)}
+                                  minimum={line.product.minimumQuantity}
+                                  step={line.product.quantityStep}
+                                  unitLabel={unitLabel(line.product.unit, "2")}
+                                  label={`Quantity of ${line.product.name}`}
+                                  onChange={(q) => cart.setQuantity(line.product, q)}
                                   size="sm"
                                 />
                               ) : (
@@ -165,7 +162,7 @@ export function CartDrawer() {
                               <button
                                 type="button"
                                 onClick={() => cart.remove(line.productId)}
-                                aria-label={`Remove ${line.snapshot.name}`}
+                                aria-label={`Remove ${line.product.name}`}
                                 className="flex size-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                               >
                                 <Trash2 className="size-4" aria-hidden="true" />
@@ -272,10 +269,10 @@ export function CartDrawer() {
 }
 
 function EmptyDrawer({
-  categories,
+  departments,
   onNavigate,
 }: {
-  categories: { slug: string; name: string; imageUrl?: string }[];
+  departments: { slug: string; name: string; imageUrl?: string }[];
   onNavigate: () => void;
 }) {
   return (
@@ -286,20 +283,20 @@ function EmptyDrawer({
         </span>
         <p className="mt-5 font-heading text-3xl">Your cart is empty</p>
         <p className="mt-2 max-w-xs text-sm text-muted-foreground">
-          Add a fabric you love and it&apos;ll wait here while you keep browsing.
+          Add something you love and it&apos;ll wait here while you keep browsing.
         </p>
         <Link href="/shop" onClick={onNavigate} className={cn(buttonVariants({ size: "lg" }), "mt-6")}>
           Shop the collection
           <ArrowRight className="size-4" aria-hidden="true" />
         </Link>
       </div>
-      <p className="eyebrow mt-12 text-muted-foreground">Shop by fabric</p>
+      <p className="eyebrow mt-12 text-muted-foreground">Shop by department</p>
       <ul className="mt-4 grid grid-cols-2 gap-3">
-        {categories.map((c) => (
+        {departments.map((c) => (
           <li key={c.slug}>
             <Link href={`/shop/${c.slug}`} onClick={onNavigate} className="group flex items-center gap-3 rounded-lg border p-2 transition-colors hover:border-foreground">
               <span className="relative size-10 shrink-0 overflow-hidden rounded-md bg-muted">
-                {c.imageUrl ? <Image src={c.imageUrl} alt="" fill sizes="40px" className="object-cover" /> : null}
+                <CategoryImage src={c.imageUrl} name={c.name} sizes="40px" showLabel={false} />
               </span>
               <span className="text-sm font-semibold">{c.name}</span>
             </Link>

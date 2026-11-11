@@ -3,19 +3,20 @@ import { Suspense } from "react";
 import { ShopBrowser } from "@/components/shop/shop-browser";
 import { ShopFallback } from "@/components/shop/shop-fallback";
 import { PageHeader } from "@/components/ui/section";
-import { catalog } from "@/lib/repository";
+import { catalog, getCatalogTree } from "@/lib/repository";
 
 export const metadata: Metadata = {
-  title: "Shop all fabrics",
+  title: "Shop all",
   description:
-    "Browse Ankara, Woven Kente, Isiagu, Ankara Sequin and luxury lace. Search by name, SKU or colour.",
+    "Shop African fabrics, ready-to-wear clothing, auto gele, turbans, ipele and beads. Search by name, SKU or colour.",
   alternates: { canonical: "/shop" },
 };
 
 export default async function ShopPage() {
-  const [products, categories] = await Promise.all([
+  const [products, categories, departments] = await Promise.all([
     catalog.getProducts(),
     catalog.getCategories(),
+    getCatalogTree(),
   ]);
 
   return (
@@ -24,16 +25,20 @@ export default async function ShopPage() {
         eyebrow="The collection"
         title={
           <>
-            Shop all <em className="text-primary">fabrics</em>
+            Shop <em className="text-primary">everything</em>
           </>
         }
-        description="Printed, woven and embellished textiles. Filter by fabric family, search by name, SKU or colour, and sort to suit."
+        description="Fabrics, ready-to-wear, headwear and accessories — every piece sold individually. Browse by department, search by name, SKU or colour, and sort to suit."
         className="border-b-0"
       />
       <Suspense fallback={<ShopFallback />}>
         <ShopBrowser
           products={products}
-          categories={categories.map(({ id, name, slug }) => ({ id, name, slug }))}
+          categories={categories.map(({ id, name }) => ({ id, name }))}
+          chips={[
+            { label: "All", href: "/shop", active: true },
+            ...departments.map((d) => ({ label: d.name, href: `/shop/${d.slug}`, active: false })),
+          ]}
         />
       </Suspense>
     </>

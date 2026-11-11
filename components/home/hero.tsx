@@ -16,21 +16,19 @@ import { buttonVariants } from "@/components/ui/button";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
-export interface HeroImage {
-  src: string;
-  alt: string;
-}
+import type { HeroImage } from "@/lib/types";
+
+export type { HeroImage };
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
 export function Hero({
   images,
-  fabrics,
-  designCount,
+  categoryNames,
 }: {
   images: HeroImage[];
-  fabrics: string[];
-  designCount: number;
+  /** Cycled in the showroom caption. */
+  categoryNames: string[];
 }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -50,17 +48,16 @@ export function Hero({
     py.set((e.clientY - rect.top) / rect.height - 0.5);
   };
 
-  const third = Math.ceil(images.length / 3);
-  const columns = [
-    images.slice(0, third),
-    images.slice(third, third * 2),
-    images.slice(third * 2),
-  ];
+  // Three columns, dealt out in turn. With only a few photos they're
+  // repeated so every column still has enough to scroll.
+  const pool = images.length === 0 ? [] : Array.from({ length: Math.max(images.length, 9) }, (_, i) => images[i % images.length]);
+  const columns = [0, 1, 2].map((c) => pool.filter((_, i) => i % 3 === c));
+  const hasReel = images.length > 0;
 
   const facts = [
-    { value: String(fabrics.length).padStart(2, "0"), label: "Fabric families" },
-    { value: String(designCount), label: "Designs online" },
-    { value: site.address.city, label: "Showroom" },
+    { value: "By the piece", label: "Ankara, Kente, Isiagu & lace" },
+    { value: "Head to toe", label: "Gele, turbans & beads" },
+    { value: site.address.city, label: "Showroom & WhatsApp" },
   ];
 
   return (
@@ -77,32 +74,32 @@ export function Hero({
       />
 
       {/* Large screens: exactly one viewport tall, so the whole hero is visible without scrolling. */}
-      <div className="mx-auto grid max-w-360 lg:h-[calc(100svh-var(--header-height))] lg:min-h-[34rem] lg:grid-cols-[1.08fr_1fr]">
+      <div className={cn("mx-auto grid max-w-360 lg:h-[calc(100svh-var(--header-height))] lg:min-h-[34rem]", hasReel && "lg:grid-cols-[1.08fr_1fr]")}>
         {/* Copy */}
         <motion.div
           style={{ y: textY, opacity: textOpacity }}
-          className="relative z-10 flex min-h-0 flex-col px-4 pt-12 pb-10 sm:px-6 sm:pt-16 lg:px-10 lg:py-[clamp(1.5rem,5svh,3.5rem)]"
+          className="relative z-10 flex min-h-0 flex-col justify-center px-4 pt-10 pb-8 sm:px-6 sm:pt-14 lg:px-10 lg:py-[clamp(1.25rem,4svh,3rem)]"
         >
-          <div className="flex flex-1 flex-col justify-center">
+          <div className="max-w-xl">
             <motion.p
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease }}
               className="eyebrow flex items-center gap-3 text-gold"
             >
-              <span className="h-px w-10 bg-gold/60" aria-hidden="true" />
+              <span className="h-px w-8 bg-gold/60" aria-hidden="true" />
               <MapPin className="size-3.5" aria-hidden="true" />
               {site.address.street}, {site.address.city}
             </motion.p>
 
             <h1
               id="hero-title"
-              className="mt-[clamp(1rem,3svh,1.75rem)] font-heading text-[3.25rem] leading-[0.88] font-medium tracking-[-0.02em] sm:text-7xl lg:text-[clamp(3.75rem,min(6.4vw,11.5svh),7.5rem)]"
+              className="mt-[clamp(0.75rem,2svh,1.25rem)] font-heading text-[2.75rem] leading-[0.95] font-bold tracking-[-0.02em] text-balance sm:text-6xl lg:text-[clamp(3.25rem,min(5.2vw,9.5svh),5.5rem)]"
             >
-              <SplitText text="The language" className="block" delay={0.1} />
-              <SplitText text="of African" className="block" delay={0.25} />
+              <SplitText text="From the fabric" className="block" delay={0.1} />
               <span className="block">
-                <SplitText text="cloth." className="text-gold italic" delay={0.4} />
+                <SplitText text="to the" delay={0.25} />{" "}
+                <SplitText text="crown." className="text-gold italic" delay={0.4} />
               </span>
             </h1>
 
@@ -110,17 +107,17 @@ export function Hero({
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, ease, delay: 0.7 }}
-              className="mt-[clamp(1rem,3svh,1.75rem)] max-w-md text-[0.9375rem] leading-relaxed text-pretty text-band-muted sm:text-base"
+              className="mt-[clamp(0.875rem,2.25svh,1.25rem)] max-w-md text-[0.9375rem] leading-relaxed text-pretty text-band-muted"
             >
-              Ankara, Woven Kente, Isiagu, sequin prints and luxury lace — printed,
-              woven and embellished textiles, brought together in one Nairobi showroom.
+              Ankara, Kente, Isiagu and luxury lace by the piece, plus ready-to-wear, gele,
+              turbans and beads — everything for the occasion under one roof.
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, ease, delay: 0.85 }}
-              className="mt-[clamp(1.25rem,4svh,2.25rem)] flex flex-wrap items-center gap-3"
+              className="mt-[clamp(1rem,3svh,1.75rem)] flex flex-wrap items-center gap-3"
             >
               <Link href="/shop" className={cn(buttonVariants({ size: "lg" }), "group")}>
                 Shop the Collection
@@ -130,14 +127,13 @@ export function Hero({
                 View the Gallery
               </Link>
             </motion.div>
-          </div>
 
-          {/* Facts */}
+          {/* Facts — sit directly under the CTAs so they're visible above the fold */}
           <motion.dl
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, ease, delay: 1.05 }}
-            className="mt-10 grid grid-cols-3 border-t border-band-foreground/12 pt-[clamp(0.875rem,2.5svh,1.5rem)] lg:mt-6"
+            className="mt-[clamp(1.5rem,4svh,2.5rem)] grid grid-cols-3 border-t border-band-foreground/12 pt-[clamp(0.875rem,2svh,1.25rem)]"
           >
             {facts.map((fact, i) => (
               <div
@@ -147,13 +143,15 @@ export function Hero({
                 <dt className="text-[0.625rem] font-semibold tracking-[0.2em] text-band-muted uppercase sm:text-[0.6875rem]">
                   {fact.label}
                 </dt>
-                <dd className="font-heading text-2xl leading-none tabular-nums lining-nums sm:text-3xl">{fact.value}</dd>
+                <dd className="font-heading text-lg leading-tight font-semibold italic sm:text-2xl">{fact.value}</dd>
               </div>
             ))}
           </motion.dl>
+          </div>
         </motion.div>
 
-        {/* Reel — decorative, the same products are listed below */}
+        {/* Reel — decorative photos chosen in /admin/hero */}
+        {hasReel ? (
         <motion.div
           aria-hidden="true"
           initial={{ opacity: 0, scale: 0.98 }}
@@ -216,25 +214,26 @@ export function Hero({
             <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(120%_80%_at_50%_50%,transparent_55%,rgb(15_12_10/0.45))]" />
             <div className="pointer-events-none absolute inset-3 rounded-xl border border-white/10" />
 
-            <FabricCaption fabrics={fabrics} />
+            <ShowroomCaption names={categoryNames} />
           </div>
         </motion.div>
+        ) : null}
       </div>
     </section>
   );
 }
 
-/** Glass caption that cycles through the fabric families. */
-function FabricCaption({ fabrics }: { fabrics: string[] }) {
+/** Glass caption that cycles through the store's categories. */
+function ShowroomCaption({ names }: { names: string[] }) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    if (fabrics.length < 2) return;
-    const id = window.setInterval(() => setIndex((i) => (i + 1) % fabrics.length), 3200);
+    if (names.length < 2) return;
+    const id = window.setInterval(() => setIndex((i) => (i + 1) % names.length), 3200);
     return () => window.clearInterval(id);
-  }, [fabrics.length]);
+  }, [names.length]);
 
-  if (fabrics.length === 0) return null;
+  if (names.length === 0) return null;
 
   return (
     <motion.div
@@ -252,14 +251,14 @@ function FabricCaption({ fabrics }: { fabrics: string[] }) {
           In the showroom
         </p>
         <div className="relative mt-0.5 h-7 w-40 overflow-hidden">
-          {fabrics.map((name, i) => (
+          {names.map((name, i) => (
             <p
               key={name}
               className={cn(
                 "absolute inset-0 font-heading text-2xl leading-7 whitespace-nowrap italic transition-[translate,opacity] duration-700 ease-silk",
                 i === index
                   ? "translate-y-0 opacity-100"
-                  : i === (index - 1 + fabrics.length) % fabrics.length
+                  : i === (index - 1 + names.length) % names.length
                     ? "-translate-y-full opacity-0"
                     : "translate-y-full opacity-0",
               )}
@@ -270,7 +269,7 @@ function FabricCaption({ fabrics }: { fabrics: string[] }) {
         </div>
       </div>
       <span className="ml-2 font-heading text-sm text-ink-muted tabular-nums lining-nums">
-        {String(index + 1).padStart(2, "0")} / {String(fabrics.length).padStart(2, "0")}
+        {String(index + 1).padStart(2, "0")} / {String(names.length).padStart(2, "0")}
       </span>
     </motion.div>
   );

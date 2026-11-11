@@ -18,7 +18,7 @@ export default function ShippingReturnsPage() {
         { title: "Shipping costs", covers: "How shipping is calculated and when the customer sees the final cost." },
         { title: "Dispatch & delivery times", covers: "Processing and courier timeframes, only once they can be guaranteed." },
         { title: "Showroom collection", covers: "Whether orders can be collected from Marcus Garvey Rd, Nairobi." },
-        { title: "Returns & exchanges", covers: "Eligibility for returns on cut fabric, condition requirements and timeframes." },
+        { title: "Returns & exchanges", covers: "Eligibility for returns on fabrics, clothing and accessories, condition requirements and timeframes." },
         { title: "Damaged or incorrect items", covers: "How to report a problem and what remedy applies." },
         { title: "Customs, duties & taxes", covers: "Who is responsible for import duties and taxes on international orders." },
       ]}

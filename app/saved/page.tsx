@@ -15,7 +15,7 @@ export default function SavedPage() {
         eyebrow="Your shortlist"
         title={
           <>
-            Saved <em>fabrics</em>
+            Saved <em>items</em>
           </>
         }
       />

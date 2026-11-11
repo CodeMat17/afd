@@ -24,7 +24,7 @@ export default function ContactPage() {
             Visit, call or <em className="text-primary">write to us</em>
           </>
         }
-        description="Questions about a fabric, quantities or colours? Reach the showroom directly."
+        description="Questions about a piece, sizes, quantities or colours? Reach the showroom directly."
       />
 
       <Container className="grid gap-14 py-12 pb-24 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20 lg:py-16">

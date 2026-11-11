@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Price } from "@/components/product/price";
+import { CategoryImage } from "@/components/ui/category-image";
 import { useCatalog } from "@/components/providers/catalog-provider";
 import { filterProducts, normaliseSearch } from "@/lib/catalog-filters";
 import { recentSearchStore, useIdList } from "@/lib/id-list-store";
@@ -17,7 +18,7 @@ const MAX_RESULTS = 6;
 /** Instant, keyboard-friendly catalogue search. Open with the header button, "/" or ⌘K. */
 export function SearchDialog() {
   const { ref, isOpen, close, onClose, onBackdropClick } = useOverlayDialog("search");
-  const { products, categories, categoryNames } = useCatalog();
+  const { products, departments, categories, categoryNames } = useCatalog();
   const router = useRouter();
   const recent = useIdList(recentSearchStore);
   const [query, setQuery] = useState("");
@@ -52,8 +53,8 @@ export function SearchDialog() {
   const matchedCategories = useMemo(() => {
     if (!term) return [];
     const needle = normaliseSearch(term);
-    return categories.filter((c) => normaliseSearch(c.name).includes(needle));
-  }, [categories, term]);
+    return [...departments, ...categories].filter((c) => normaliseSearch(`${c.name} ${c.tagline}`).includes(needle));
+  }, [departments, categories, term]);
   const popular = useMemo(() => products.filter((p) => p.isFeatured && p.isAvailable).slice(0, 4), [products]);
 
   const remember = (value: string) => {
@@ -107,7 +108,7 @@ export function SearchDialog() {
         >
           <Search className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
           <label htmlFor="global-search" className="sr-only">
-            Search fabrics by name, SKU, colour or category
+            Search products by name, SKU, colour or category
           </label>
           <input
             ref={inputRef}
@@ -115,7 +116,7 @@ export function SearchDialog() {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search fabrics, colours, SKUs…"
+            placeholder="Search products, colours, SKUs…"
             autoComplete="off"
             enterKeyHint="search"
             className="h-full min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground focus-visible:outline-none [&::-webkit-search-cancel-button]:hidden"
@@ -183,9 +184,9 @@ export function SearchDialog() {
                 </Group>
               ) : null}
 
-              <Group title="Browse fabrics">
+              <Group title="Browse departments">
                 <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {categories.map((c) => (
+                  {departments.map((c) => (
                     <li key={c.slug}>
                       <Link
                         data-result
@@ -194,7 +195,7 @@ export function SearchDialog() {
                         className="flex items-center gap-3 rounded-lg border p-2 transition-colors hover:border-foreground focus-visible:border-foreground"
                       >
                         <span className="relative size-10 shrink-0 overflow-hidden rounded-md bg-muted">
-                          {c.imageUrl ? <Image src={c.imageUrl} alt="" fill sizes="40px" className="object-cover" /> : null}
+                          <CategoryImage src={c.imageUrl} name={c.name} sizes="40px" showLabel={false} />
                         </span>
                         <span className="min-w-0">
                           <span className="block truncate text-sm font-semibold">{c.name}</span>
@@ -216,13 +217,13 @@ export function SearchDialog() {
             <div className="py-10 text-center">
               <p className="font-heading text-3xl">No matches for “{term}”</p>
               <p className="mt-2 text-sm text-muted-foreground">
-                Try a colour like “gold”, a fabric family like “kente”, or a SKU.
+                Try a colour like “gold”, a category like “kente” or “gele”, or a SKU.
               </p>
             </div>
           ) : (
             <div className="space-y-8">
               {matchedCategories.length > 0 ? (
-                <Group title="Fabric families">
+                <Group title="Categories">
                   <ul className="flex flex-wrap gap-2">
                     {matchedCategories.map((c) => (
                       <li key={c.slug}>

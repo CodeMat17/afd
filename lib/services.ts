@@ -3,7 +3,8 @@
  *
  * Every method currently resolves to `not-configured`. The UI renders that
  * honestly; nothing here pretends a request succeeded. Replace these with
- * Convex-backed implementations in the backend phase.
+ * Convex-backed implementations in the backend phase. (Checkout is live: see
+ * app/checkout/actions.ts.)
  */
 
 export type ServiceResult<T = null> =
@@ -36,10 +37,6 @@ export interface ContactService {
   }): Promise<ServiceResult>;
 }
 
-export interface OrderService {
-  submitOrder(): Promise<ServiceResult<{ orderNumber: string }>>;
-}
-
 export const authService: AuthService = {
   signIn: () => settle(notConfigured("Sign-in")),
   signUp: () => settle(notConfigured("Account creation")),
@@ -49,8 +46,4 @@ export const authService: AuthService = {
 
 export const contactService: ContactService = {
   sendMessage: () => settle(notConfigured("The contact form")),
-};
-
-export const orderService: OrderService = {
-  submitOrder: () => settle(notConfigured("Order submission")),
 };

@@ -25,7 +25,7 @@ export default function NotFound() {
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link href="/shop" className={buttonVariants({ size: "lg" })}>
-            Shop all fabrics
+            Shop everything
           </Link>
           <Link href="/" className={buttonVariants({ variant: "outline", size: "lg" })}>
             Back to home

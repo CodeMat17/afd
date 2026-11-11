@@ -1,12 +1,14 @@
 "use client";
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import type { Product, ProductCategory } from "@/lib/types";
+import type { NavCategory, NavDepartment } from "@/lib/catalog-tree";
+import type { Product } from "@/lib/types";
 
-export type CatalogCategory = Pick<ProductCategory, "id" | "name" | "slug" | "tagline" | "imageUrl">;
+export type CatalogCategory = NavCategory;
 
 interface CatalogContextValue {
   products: Product[];
+  departments: NavDepartment[];
   categories: CatalogCategory[];
   byId: Map<string, Product>;
   categoryNames: Record<string, string>;
@@ -21,21 +23,24 @@ const CatalogContext = createContext<CatalogContextValue | null>(null);
  */
 export function CatalogProvider({
   products,
+  departments,
   categories,
   children,
 }: {
   products: Product[];
+  departments: NavDepartment[];
   categories: CatalogCategory[];
   children: ReactNode;
 }) {
   const value = useMemo(
     () => ({
       products,
+      departments,
       categories,
       byId: new Map(products.map((p) => [p.id, p])),
       categoryNames: Object.fromEntries(categories.map((c) => [c.id, c.name])),
     }),
-    [products, categories],
+    [products, departments, categories],
   );
   return <CatalogContext.Provider value={value}>{children}</CatalogContext.Provider>;
 }

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
-import type { NavCategory } from "@/components/layout/header";
+import type { NavDepartment } from "@/lib/catalog-tree";
 import { policyNav, primaryNav, site } from "@/lib/site";
 import { whatsappUrl } from "@/lib/whatsapp";
 
@@ -14,7 +14,7 @@ async function CopyrightYear() {
   return <>{new Date().getFullYear()}</>;
 }
 
-export function Footer({ categories }: { categories: NavCategory[] }) {
+export function Footer({ departments }: { departments: NavDepartment[] }) {
   return (
     <footer className="grain relative overflow-hidden bg-band text-band-foreground">
       {/* Oversized wordmark */}
@@ -52,10 +52,10 @@ export function Footer({ categories }: { categories: NavCategory[] }) {
         </div>
 
         <FooterColumn title="Shop">
-          <FooterLink href="/shop">All fabrics</FooterLink>
-          {categories.map((c) => (
-            <FooterLink key={c.slug} href={`/shop/${c.slug}`}>
-              {c.name}
+          <FooterLink href="/shop">Shop everything</FooterLink>
+          {departments.map((d) => (
+            <FooterLink key={d.slug} href={`/shop/${d.slug}`}>
+              {d.name}
             </FooterLink>
           ))}
         </FooterColumn>

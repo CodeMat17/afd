@@ -9,13 +9,15 @@ import { PurchasePanel } from "@/components/product/purchase-panel";
 import { RecentlyViewed, TrackRecentlyViewed } from "@/components/product/recently-viewed";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Container, SectionHeading } from "@/components/ui/section";
+import { SIZE_LABELS, type SizeField } from "@/lib/admin/product-fields";
 import { catalog } from "@/lib/repository";
 import type { Product } from "@/lib/types";
 import { unitLabel } from "@/lib/whatsapp";
 
 export async function generateStaticParams() {
   const products = await catalog.getProducts();
-  return products.map((p) => ({ slug: p.slug }));
+  // Cache Components needs at least one param; an empty catalogue 404s on it.
+  return products.length ? products.map((p) => ({ slug: p.slug })) : [{ slug: "coming-soon" }];
 }
 
 export async function generateMetadata({
@@ -52,6 +54,8 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
     catalog.getRelatedProducts(product, 4),
     catalog.getCategories(),
   ]);
+  const department = category ? await catalog.getDepartmentById(category.departmentId) : null;
+  const isFabric = department?.slug === "fabrics";
   const categoryNames = Object.fromEntries(categories.map((c) => [c.id, c.name]));
 
   return (
@@ -61,6 +65,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
           items={[
             { label: "Home", href: "/" },
             { label: "Shop", href: "/shop" },
+            ...(department ? [{ label: department.name, href: `/shop/${department.slug}` }] : []),
             ...(category ? [{ label: category.name, href: `/shop/${category.slug}` }] : []),
             { label: product.name },
           ]}
@@ -91,12 +96,14 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
                   <dt>SKU</dt>
                   <dd className="font-semibold text-foreground">{product.sku}</dd>
                 </div>
-                <div className="flex gap-1.5">
-                  <dt>Minimum order</dt>
-                  <dd className="font-semibold text-foreground">
-                    {product.minimumQuantity} {unitLabel(product.unit, product.minimumQuantity)}
-                  </dd>
-                </div>
+                {product.minimumQuantity !== "1" ? (
+                  <div className="flex gap-1.5">
+                    <dt>Minimum order</dt>
+                    <dd className="font-semibold text-foreground">
+                      {product.minimumQuantity} {unitLabel(product.unit, product.minimumQuantity)}
+                    </dd>
+                  </div>
+                ) : null}
               </dl>
             </Reveal>
 
@@ -117,6 +124,8 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
                   </ul>
                 </div>
               ) : null}
+
+              <SizeChart sizes={product.sizes} />
             </Reveal>
 
             <Reveal
@@ -127,7 +136,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
             </Reveal>
 
             <Reveal delay={0.2}>
-              <FabricDetails product={product} />
+              <ProductDetailsPanel product={product} isFabric={isFabric} />
             </Reveal>
           </div>
         </div>
@@ -174,22 +183,49 @@ function Availability({ available }: { available: boolean }) {
   );
 }
 
-function FabricDetails({ product }: { product: Product }) {
+/** Garment measurements — only the ones entered for this piece are shown. */
+function SizeChart({ sizes }: { sizes?: Product["sizes"] }) {
+  const rows = (Object.entries(SIZE_LABELS) as [SizeField, string][]).flatMap(([key, label]) => {
+    const value = sizes?.[key]?.trim();
+    return value ? [{ label, value }] : [];
+  });
+  if (rows.length === 0) return null;
+
+  return (
+    <div className="mt-6">
+      <p className="text-xs font-semibold tracking-[0.12em] uppercase">Size</p>
+      <dl className="mt-3 flex flex-wrap gap-2">
+        {rows.map((row) => (
+          <div key={row.label} className="flex min-w-24 flex-col rounded-xl border px-4 py-2.5">
+            <dt className="text-[0.625rem] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+              {row.label}
+            </dt>
+            <dd className="mt-0.5 font-heading text-xl leading-tight tabular-nums lining-nums">{row.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+function ProductDetailsPanel({ product, isFabric }: { product: Product; isFabric: boolean }) {
   const { details } = product;
   const rows: [string, string][] = [
-    ["Selling unit", `Per ${product.unit}`],
+    ["Sold as", product.unit === "piece" ? "Single piece — a quantity of 2 means two pieces" : `Per ${product.unit}`],
     ...(details.pieceLength ? [["Piece length", details.pieceLength] as [string, string]] : []),
     ...(details.material ? [["Material", details.material] as [string, string]] : []),
     ...(details.width ? [["Width", details.width] as [string, string]] : []),
-    ...(details.patternNotes ? [["Pattern", details.patternNotes] as [string, string]] : []),
+    ...(details.patternNotes ? [["Notes", details.patternNotes] as [string, string]] : []),
     ...(details.care ? [["Care", details.care] as [string, string]] : []),
   ];
-  const missing = !details.material || !details.width || !details.care;
+  const missing = isFabric
+    ? !details.pieceLength || !details.material || !details.care
+    : !details.material || !details.care;
 
   return (
     <details className="group mt-8 border-y" open>
       <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between text-xs font-semibold tracking-[0.12em] uppercase [&::-webkit-details-marker]:hidden">
-        Fabric details
+        Product details
         <span className="text-lg leading-none transition-transform group-open:rotate-45" aria-hidden="true">
           +
         </span>
@@ -204,8 +240,10 @@ function FabricDetails({ product }: { product: Product }) {
       </dl>
       {missing ? (
         <p className="pb-6 text-xs leading-relaxed text-muted-foreground">
-          Material, width and care information hasn&apos;t been supplied for this design yet. Ask on
-          WhatsApp to confirm these details before ordering.
+          {isFabric
+            ? "Piece length, material and care information hasn't been supplied for this design yet."
+            : "Material and care information hasn't been supplied for this piece yet."}{" "}
+          Ask on WhatsApp to confirm before ordering.
         </p>
       ) : null}
     </details>

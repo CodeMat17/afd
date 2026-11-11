@@ -1,4 +1,4 @@
-/** Decorative ticker of fabric names between the hero and categories. */
+/** Decorative ticker of category names between the hero and departments. */
 export function FabricTicker({ names }: { names: string[] }) {
   const items = [...names, ...names, ...names, ...names];
   return (

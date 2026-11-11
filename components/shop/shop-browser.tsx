@@ -1,12 +1,13 @@
 "use client";
 
-import { ArrowDown, Check, Search, SlidersHorizontal, X } from "lucide-react";
+import { Check, Search, SlidersHorizontal, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
 import { useMemo, useRef, useState, useTransition, type ReactNode } from "react";
 import { ProductGrid } from "@/components/product/product-grid";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   COLOUR_FAMILIES,
   PAGE_SIZE,
@@ -25,17 +26,31 @@ import type { Product, ProductCategory } from "@/lib/types";
 import { useDialog } from "@/lib/use-dialog";
 import { cn } from "@/lib/utils";
 
-type ChipCategory = Pick<ProductCategory, "id" | "name" | "slug">;
+type NameCategory = Pick<ProductCategory, "id" | "name">;
+
+export interface ShopChip {
+  label: string;
+  href: string;
+  active: boolean;
+}
 type Patch = Record<string, string | null>;
 
 export function ShopBrowser({
   products,
   categories,
-  activeCategory,
+  chips,
+  scoped = false,
+  emptyCollection,
 }: {
   products: Product[];
-  categories: ChipCategory[];
-  activeCategory?: string;
+  /** Every category, used for names on cards and in search. */
+  categories: NameCategory[];
+  /** Navigation chips: departments on /shop, sibling categories inside a department. */
+  chips: ShopChip[];
+  /** True on a department or category page (clearing filters returns to /shop). */
+  scoped?: boolean;
+  /** Shown instead of the grid when this collection has no products yet. */
+  emptyCollection?: ReactNode;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -96,7 +111,7 @@ export function ShopBrowser({
     window.clearTimeout(debounce.current);
     setDraft("");
     startTransition(() => {
-      if (activeCategory) router.push("/shop", { scroll: false });
+      if (scoped) router.push("/shop", { scroll: false });
       else router.replace("/shop", { scroll: false });
     });
   };
@@ -104,7 +119,7 @@ export function ShopBrowser({
   const facetCount =
     filters.colours.length + (filters.price ? 1 : 0) + (filters.availableOnly ? 1 : 0);
   const hasFilters =
-    filters.query !== "" || facetCount > 0 || filters.sort !== "featured" || Boolean(activeCategory);
+    filters.query !== "" || facetCount > 0 || filters.sort !== "featured" || scoped;
   const queryString = searchParams.toString();
   const withQuery = (href: string) => (queryString ? `${href}?${queryString}` : href);
   const filterKey = `${pathname}|${queryString}`;
@@ -120,22 +135,15 @@ export function ShopBrowser({
     />
   );
 
-  return (
-    <div>
-      {/* Category chips */}
+  const chipNav = (
       <div className="border-b bg-background">
         <div className="mx-auto max-w-360 px-4 sm:px-6 lg:px-10">
           <nav aria-label="Categories" className="-mx-4 sm:-mx-6 lg:mx-0">
             <ul className="scrollbar-none flex gap-2 overflow-x-auto px-4 py-4 sm:px-6 lg:flex-wrap lg:px-0">
-              <li>
-                <CategoryChip href={withQuery("/shop")} active={!activeCategory}>
-                  All fabrics
-                </CategoryChip>
-              </li>
-              {categories.map((c) => (
-                <li key={c.id}>
-                  <CategoryChip href={withQuery(`/shop/${c.slug}`)} active={activeCategory === c.slug}>
-                    {c.name}
+              {chips.map((chip) => (
+                <li key={chip.href}>
+                  <CategoryChip href={withQuery(chip.href)} active={chip.active}>
+                    {chip.label}
                   </CategoryChip>
                 </li>
               ))}
@@ -143,6 +151,20 @@ export function ShopBrowser({
           </nav>
         </div>
       </div>
+  );
+
+  if (products.length === 0 && emptyCollection) {
+    return (
+      <div>
+        {chipNav}
+        {emptyCollection}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {chipNav}
 
       {/* Sticky toolbar */}
       <div className="sticky top-(--header-height) z-30 border-b bg-background/90 backdrop-blur-xl backdrop-saturate-150">
@@ -193,23 +215,31 @@ export function ShopBrowser({
             ) : null}
           </button>
 
-          <div className="relative shrink-0">
+          <div className="shrink-0">
             <label htmlFor="shop-sort" className="sr-only">
               Sort products
             </label>
-            <select
-              id="shop-sort"
+            <Select
+              items={SORT_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
               value={filters.sort}
-              onChange={(e) => updateParams({ sort: e.target.value === "featured" ? null : e.target.value })}
-              className="h-11 w-28 cursor-pointer appearance-none truncate rounded-full border border-input bg-surface pr-9 pl-4 text-sm font-medium transition-colors hover:border-foreground focus-visible:border-primary sm:w-52"
+              onValueChange={(next) => {
+                if (typeof next === "string") updateParams({ sort: next === "featured" ? null : next });
+              }}
             >
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-            <ArrowDown className="pointer-events-none absolute top-1/2 right-3.5 size-3.5 -translate-y-1/2" aria-hidden="true" />
+              <SelectTrigger
+                id="shop-sort"
+                className="h-11 w-28 cursor-pointer rounded-full bg-surface pr-3.5 pl-4 text-sm font-medium data-[size=default]:h-11 hover:border-foreground focus-visible:border-primary sm:w-52"
+              >
+                <SelectValue className="truncate" />
+              </SelectTrigger>
+              <SelectContent align="end" alignItemWithTrigger={false} className="min-w-52">
+                {SORT_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value} className="py-2 pl-2.5">
+                    {o.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
@@ -253,7 +283,7 @@ export function ShopBrowser({
           </div>
 
           {results.length === 0 ? (
-            <EmptyState onClear={clearAll} showAllHref={activeCategory ? "/shop" : undefined} />
+            <EmptyState onClear={clearAll} showAllHref={scoped ? "/shop" : undefined} />
           ) : (
             <PagedResults key={filterKey} products={results} categoryNames={categoryNames} />
           )}
@@ -522,7 +552,7 @@ function EmptyState({ onClear, showAllHref }: { onClear: () => void; showAllHref
             href={showAllHref}
             className="inline-flex h-11 items-center rounded-full border border-foreground/20 px-6 text-sm font-semibold hover:border-foreground"
           >
-            Search all fabrics
+            Search the whole store
           </Link>
         ) : null}
       </div>

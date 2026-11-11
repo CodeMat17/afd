@@ -5,7 +5,7 @@ export const site = {
   domain: "africanfabricanddesigns.com",
   url: "https://africanfabricanddesigns.com",
   description:
-    "African textiles from our Nairobi showroom: Ankara, Woven Kente, Isiagu, Ankara Sequin and luxury lace.",
+    "African fabrics, ready-to-wear clothing, auto gele, turbans, ipele and beads from our Nairobi showroom.",
   address: {
     street: "Marcus Garvey Rd",
     city: "Nairobi",

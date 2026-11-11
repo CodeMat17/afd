@@ -4,14 +4,16 @@ import { ProductGrid } from "@/components/product/product-grid";
 import { buttonVariants } from "@/components/ui/button";
 import { Container, SectionHeading } from "@/components/ui/section";
 import type { Product } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn, formatList } from "@/lib/utils";
 
 export function FeaturedProducts({
   products,
   categoryNames,
+  departmentNames,
 }: {
   products: Product[];
   categoryNames: Record<string, string>;
+  departmentNames: string[];
 }) {
   return (
     <section aria-labelledby="featured-title" className="border-t bg-surface py-20 sm:py-24 lg:py-32">
@@ -24,10 +26,10 @@ export function FeaturedProducts({
               Featured <em className="text-primary">this season</em>
             </>
           }
-          description="A curated cross-section of the catalogue — prints, woven cloth, Isiagu and lace."
+          description={`A curated cross-section of the store — ${formatList(departmentNames).toLowerCase()}.`}
           action={
             <Link href="/shop" className={cn(buttonVariants({ variant: "outline" }), "group")}>
-              Shop all fabrics
+              Shop everything
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
             </Link>
           }

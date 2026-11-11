@@ -8,7 +8,8 @@ import { CartDrawer } from "@/components/cart/cart-drawer";
 import { Providers } from "@/components/providers";
 import { CatalogProvider } from "@/components/providers/catalog-provider";
 import { SearchDialog } from "@/components/search/search-dialog";
-import { catalog } from "@/lib/repository";
+import { flattenCategories } from "@/lib/catalog-tree";
+import { catalog, getCatalogTree } from "@/lib/repository";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -29,7 +30,7 @@ const cormorant = Cormorant_Garamond({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — African textiles from Nairobi`,
+    default: `${site.name} — African fabrics, clothing & accessories`,
     template: `%s · ${site.name}`,
   },
   description: site.description,
@@ -54,14 +55,7 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const [categories, products] = await Promise.all([catalog.getCategories(), catalog.getProducts()]);
-  const nav = categories.map(({ id, name, slug, tagline, imageUrl }) => ({
-    id,
-    name,
-    slug,
-    tagline,
-    imageUrl,
-  }));
+  const [departments, products] = await Promise.all([getCatalogTree(), catalog.getProducts()]);
 
   return (
     <html lang="en-KE" className={`${manrope.variable} ${cormorant.variable} antialiased`} suppressHydrationWarning>
@@ -73,14 +67,19 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         <Providers>
-          <CatalogProvider products={products} categories={nav}>
+          <CatalogProvider products={products} departments={departments} categories={flattenCategories(departments)}>
             {/* <AnnouncementBar /> */}
-            <Header categories={nav} />
+            {/* `data-site-chrome` is hidden inside the admin (see globals.css). */}
+            <div data-site-chrome="" className="contents">
+              <Header departments={departments} />
+            </div>
             <main id="main" className="flex-1">
               {children}
             </main>
-            <Footer categories={nav} />
-            <FloatingCart />
+            <div data-site-chrome="" className="contents">
+              <Footer departments={departments} />
+              <FloatingCart />
+            </div>
             <CartDrawer />
             <SearchDialog />
           </CatalogProvider>

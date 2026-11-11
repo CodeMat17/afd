@@ -31,7 +31,7 @@ export function SavedView() {
         </span>
         <h2 className="mt-6 font-heading text-4xl">Nothing saved yet</h2>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          Tap the heart on any fabric to keep it here — handy for comparing prints or sharing a shortlist.
+          Tap the heart on anything to keep it here — handy for comparing pieces or sharing a shortlist.
         </p>
         <Link href="/shop" className={cn(buttonVariants({ size: "lg" }), "mt-8")}>
           Explore the collection
@@ -55,7 +55,7 @@ export function SavedView() {
           {available.length > 0 ? (
             <Button
               onClick={() => {
-                for (const p of available) cartActions.add(p, p.minimumQuantity);
+                cartActions.addMany(available.map((p) => ({ product: p, quantity: p.minimumQuantity })));
                 overlay.open("cart");
               }}
             >

@@ -2,6 +2,7 @@
 
 import Lenis from "lenis";
 import { useEffect } from "react";
+import { registerLenis } from "@/lib/scroll";
 
 /**
  * Inertial smooth scrolling for wheel input. Disabled for users who prefer
@@ -23,7 +24,12 @@ export function SmoothScroll() {
       prevent: (node) => node.closest("dialog, [data-lenis-prevent]") !== null,
     });
 
-    return () => lenis.destroy();
+    registerLenis(lenis);
+
+    return () => {
+      registerLenis(null);
+      lenis.destroy();
+    };
   }, []);
 
   return null;

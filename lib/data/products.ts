@@ -2,12 +2,14 @@
  * DEVELOPMENT / TEST DATA.
  *
  * Names, colours and pattern notes describe what is visible in the supplied
- * photographs. Prices, units, minimums, stock and availability are
- * placeholders for UI development only and must be replaced with real
- * catalogue data before launch. Do not import this file from UI components —
- * go through `lib/repository`.
+ * photographs. Prices, stock and availability are placeholders for UI
+ * development only and must be replaced with real catalogue data before
+ * launch. Only `scripts/seed-catalog.mjs` reads this file (to import it into
+ * Convex + Cloudinary); the storefront reads Convex via `lib/repository`.
+ *
+ * Every listing is one piece: a quantity of 2 means two pieces of that design.
  */
-import type { Product, ProductUnit } from "@/lib/types";
+import type { GarmentSizes, Product } from "@/lib/types";
 
 interface Seed {
   file: string;
@@ -20,17 +22,18 @@ interface Seed {
   colours: string[];
   patternNotes: string;
   price: string;
-  unit: ProductUnit;
-  minimumQuantity: string;
+  sizes?: GarmentSizes;
   isAvailable?: boolean;
   isFeatured?: boolean;
   createdAt: string;
 }
 
+type SeedInput = Omit<Seed, "folder" | "categoryId">;
+
 function slugify(value: string): string {
   return value
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
     .replace(/&/g, "and")
     .replace(/[^a-z0-9]+/g, "-")
@@ -48,15 +51,17 @@ function build(seed: Seed): Product {
     description: seed.description,
     price: seed.price,
     currency: "USD",
-    unit: seed.unit,
-    minimumQuantity: seed.minimumQuantity,
+    unit: "piece",
+    minimumQuantity: "1",
     quantityStep: "1",
-    stockQuantity: "0",
+    // Stock isn't tracked yet; availability is controlled by `isAvailable`.
+    stockQuantity: null,
     isAvailable: seed.isAvailable ?? true,
     isFeatured: seed.isFeatured ?? false,
     createdAt: seed.createdAt,
     colours: seed.colours,
     details: { patternNotes: seed.patternNotes },
+    sizes: seed.sizes,
     images: [
       {
         id: `img-${seed.sku.toLowerCase()}-1`,
@@ -71,48 +76,17 @@ function build(seed: Seed): Product {
   };
 }
 
-const ankara = (s: Omit<Seed, "folder" | "categoryId" | "unit" | "minimumQuantity">): Seed => ({
-  ...s,
-  folder: "ankara",
-  categoryId: "cat-ankara",
-  unit: "yard",
-  minimumQuantity: "6",
-});
+const inCategory =
+  (folder: string, categoryId: string) =>
+  (s: SeedInput): Seed => ({ ...s, folder, categoryId });
 
-const kente = (s: Omit<Seed, "folder" | "categoryId" | "unit" | "minimumQuantity">): Seed => ({
-  ...s,
-  folder: "wooven-kente",
-  categoryId: "cat-woven-kente",
-  unit: "piece",
-  minimumQuantity: "1",
-});
-
-const lace = (
-  s: Omit<Seed, "folder" | "categoryId" | "unit" | "minimumQuantity"> &
-    Partial<Pick<Seed, "unit" | "minimumQuantity">>,
-): Seed => ({
-  unit: "yard",
-  minimumQuantity: "5",
-  ...s,
-  folder: "luxury-lace",
-  categoryId: "cat-luxury-lace",
-});
-
-const isiagu = (s: Omit<Seed, "folder" | "categoryId" | "unit" | "minimumQuantity">): Seed => ({
-  ...s,
-  folder: "isiagu-fabric",
-  categoryId: "cat-isiagu",
-  unit: "yard",
-  minimumQuantity: "5",
-});
-
-const sequin = (s: Omit<Seed, "folder" | "categoryId" | "unit" | "minimumQuantity">): Seed => ({
-  ...s,
-  folder: "ankara-sequin",
-  categoryId: "cat-ankara-sequin",
-  unit: "yard",
-  minimumQuantity: "5",
-});
+const ankara = inCategory("ankara", "cat-ankara");
+const kente = inCategory("wooven-kente", "cat-woven-kente");
+const lace = inCategory("luxury-lace", "cat-luxury-lace");
+const isiagu = inCategory("isiagu-fabric", "cat-isiagu");
+const sequin = inCategory("ankara-sequin", "cat-ankara-sequin");
+/** Sewn womenswear; photos currently live in the lace folder. */
+const womenswear = inCategory("luxury-lace", "cat-womenswear");
 
 const seeds: Seed[] = [
   // ── Ankara ────────────────────────────────────────────────────────────
@@ -478,7 +452,7 @@ const seeds: Seed[] = [
     price: "40.00",
     createdAt: "2026-05-15",
   }),
-  lace({
+  womenswear({
     file: "1000597840-680x920.jpg",
     name: "Midnight Crystal Beaded Gown",
     sku: "LAC-3006",
@@ -486,14 +460,14 @@ const seeds: Seed[] = [
       "A sheer black gown on a mannequin, densely beaded with silver vines and finished with a flowing tulle cape.",
     alt: "Black sheer gown on a mannequin, densely embellished with silver beaded vines and a tulle cape",
     colours: ["Black", "Silver"],
-    patternNotes: "Displayed as a finished gown.",
+    patternNotes: "Finished gown with tulle cape.",
     price: "420.00",
-    unit: "piece",
-    minimumQuantity: "1",
+    // Sample measurements so the size panel can be previewed; replace from the dashboard.
+    sizes: { bust: "36 in", waist: "30 in" },
     isFeatured: true,
     createdAt: "2026-10-05",
   }),
-  lace({
+  womenswear({
     file: "1000597868-680x920.jpg",
     name: "Ivory Crystal Beaded Gown",
     sku: "LAC-3007",
@@ -501,10 +475,8 @@ const seeds: Seed[] = [
       "A sheer ivory gown with crystal beading sculpted to the bodice, cascading fringe and a full tulle cape.",
     alt: "Ivory sheer gown on a mannequin with crystal beading, fringe and a tulle cape",
     colours: ["Ivory", "Silver"],
-    patternNotes: "Displayed as a finished gown.",
+    patternNotes: "Finished gown with tulle cape.",
     price: "420.00",
-    unit: "piece",
-    minimumQuantity: "1",
     createdAt: "2026-10-03",
   }),
 

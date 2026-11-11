@@ -1,22 +1,22 @@
 "use client";
 
 import { ArrowUpRight, Heart, Mail, MapPin, Phone, Search, User, X } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
-import type { NavCategory } from "@/components/layout/header";
+import { CategoryImage } from "@/components/ui/category-image";
+import type { NavDepartment } from "@/lib/catalog-tree";
 import { primaryNav, site } from "@/lib/site";
 import { overlay } from "@/lib/ui-store";
 import { useDialog } from "@/lib/use-dialog";
 import { whatsappUrl } from "@/lib/whatsapp";
 
 export function MobileMenu({
-  categories,
+  departments,
   trigger,
 }: {
-  categories: NavCategory[];
+  departments: NavDepartment[];
   trigger: ReactNode;
 }) {
   const { ref, isOpen, open, close, onClose } = useDialog();
@@ -66,7 +66,7 @@ export function MobileMenu({
               className="flex h-12 w-full items-center gap-3 rounded-full border border-input bg-surface px-4 text-sm text-muted-foreground"
             >
               <Search className="size-4" aria-hidden="true" />
-              Search fabrics, colours, SKUs…
+              Search products, colours, SKUs…
             </button>
           </div>
 
@@ -86,24 +86,33 @@ export function MobileMenu({
               ))}
             </ul>
 
-            <p className="eyebrow mt-8 text-muted-foreground">Shop by fabric</p>
-            <ul className="mt-4 grid grid-cols-2 gap-3">
-              {categories.map((category) => (
-                <li key={category.slug}>
-                  <Link href={`/shop/${category.slug}`} onClick={close} className="group block">
-                    <div className="relative aspect-5/4 overflow-hidden rounded-xl bg-muted">
-                      {category.imageUrl ? (
-                        <Image
-                          src={category.imageUrl}
-                          alt=""
-                          fill
-                          sizes="45vw"
-                          className="object-cover"
-                        />
-                      ) : null}
-                    </div>
-                    <p className="mt-2 text-sm font-semibold">{category.name}</p>
+            <p className="eyebrow mt-8 text-muted-foreground">Shop by department</p>
+            <ul className="mt-4 divide-y border-y">
+              {departments.map((department) => (
+                <li key={department.slug} className="py-4">
+                  <Link href={`/shop/${department.slug}`} onClick={close} className="group flex items-center gap-4">
+                    <span className="relative h-16 w-13 shrink-0 overflow-hidden rounded-lg bg-muted">
+                      <CategoryImage src={department.imageUrl} name={department.name} sizes="52px" showLabel={false} />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-heading text-2xl leading-tight">{department.name}</span>
+                      <span className="block text-xs text-muted-foreground">{department.tagline}</span>
+                    </span>
+                    <ArrowUpRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
                   </Link>
+                  <ul className="mt-3 flex flex-wrap gap-2">
+                    {department.categories.map((category) => (
+                      <li key={category.slug}>
+                        <Link
+                          href={`/shop/${category.slug}`}
+                          onClick={close}
+                          className="inline-flex h-9 items-center rounded-full border border-input bg-surface px-3.5 text-[0.8125rem] font-semibold transition-colors hover:border-foreground"
+                        >
+                          {category.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
                 </li>
               ))}
             </ul>
@@ -118,7 +127,7 @@ export function MobileMenu({
               <User className="size-4" aria-hidden="true" /> Account
             </Link>
             <Link href="/saved" onClick={close} className="flex min-h-11 items-center gap-3">
-              <Heart className="size-4" aria-hidden="true" /> Saved fabrics
+              <Heart className="size-4" aria-hidden="true" /> Saved items
             </Link>
             <a href={site.phone.href} className="flex min-h-11 items-center gap-3">
               <Phone className="size-4" aria-hidden="true" /> {site.phone.display}

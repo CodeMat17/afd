@@ -20,12 +20,12 @@ export function SavedView() {
   const available = products.filter((p) => p.isAvailable);
 
   if (!hydrated) {
-    return <div className="h-96 animate-pulse rounded-2xl bg-muted" aria-busy="true" />;
+    return <div key="loading" className="h-[26rem] animate-pulse rounded-2xl bg-muted" aria-busy="true" />;
   }
 
   if (products.length === 0) {
     return (
-      <div className="mx-auto flex max-w-md flex-col items-center py-16 text-center">
+      <div key="empty" className="mx-auto flex min-h-[26rem] max-w-md flex-col items-center py-16 text-center">
         <span className="flex size-20 items-center justify-center rounded-full border border-dashed border-foreground/30">
           <Heart className="size-7 text-muted-foreground" aria-hidden="true" />
         </span>

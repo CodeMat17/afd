@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { CollectionEmpty } from "@/components/shop/collection-empty";
 import { ShopBrowser, type ShopChip } from "@/components/shop/shop-browser";
-import { ShopFallback } from "@/components/shop/shop-fallback";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { PageHeader } from "@/components/ui/section";
 import type { NavDepartment } from "@/lib/catalog-tree";
@@ -96,15 +94,13 @@ export default async function CollectionPage({ params }: PageProps<"/shop/[categ
           ]}
         />
       </PageHeader>
-      <Suspense fallback={<ShopFallback />}>
-        <ShopBrowser
-          products={products}
-          categories={categories.map(({ id, name }) => ({ id, name }))}
-          chips={chipsFor(department, slug)}
-          scoped
-          emptyCollection={<CollectionEmpty name={name} />}
-        />
-      </Suspense>
+      <ShopBrowser
+        products={products}
+        categories={categories.map(({ id, name }) => ({ id, name }))}
+        chips={chipsFor(department, slug)}
+        scoped
+        emptyCollection={<CollectionEmpty name={name} />}
+      />
     </>
   );
 }

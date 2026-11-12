@@ -28,7 +28,7 @@ export function CartView({ products }: { products: Product[] }) {
 
   if (!cart.ready) {
     return (
-      <div className="grid gap-10 lg:grid-cols-[1fr_24rem]" aria-busy="true">
+      <div key="loading" className="grid gap-10 lg:min-h-[26rem] lg:grid-cols-[1fr_24rem]" aria-busy="true">
         <div className="space-y-4">
           {[0, 1].map((i) => (
             <div key={i} className="h-36 animate-pulse rounded-2xl bg-muted" />
@@ -41,7 +41,7 @@ export function CartView({ products }: { products: Product[] }) {
 
   if (cart.lines.length === 0) {
     return (
-      <div className="mx-auto flex max-w-md flex-col items-center py-16 text-center">
+      <div key="empty" className="mx-auto flex max-w-md flex-col items-center py-16 text-center lg:min-h-[26rem]">
         <span className="flex size-20 items-center justify-center rounded-full border border-dashed border-foreground/30">
           <ShoppingBag className="size-7 text-muted-foreground" aria-hidden="true" />
         </span>

@@ -11,11 +11,14 @@ export function ProductGrid({
   categoryNames,
   className,
   priorityCount = 0,
+  headingLevel,
 }: {
   products: Product[];
   categoryNames: Record<string, string>;
   className?: string;
   priorityCount?: number;
+  /** Heading element for card titles — "h2" when the grid sits directly under the page's h1. */
+  headingLevel?: "h2" | "h3";
 }) {
   return (
     <ul className={cn(productGridClass, className)}>
@@ -26,6 +29,7 @@ export function ProductGrid({
               product={product}
               categoryName={categoryNames[product.categoryId]}
               priority={i < priorityCount}
+              headingLevel={headingLevel}
             />
           </Reveal>
         </li>

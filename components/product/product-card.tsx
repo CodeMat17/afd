@@ -18,10 +18,12 @@ export function ProductCard({
   product,
   categoryName,
   priority = false,
+  headingLevel: Heading = "h3",
 }: {
   product: Product;
   categoryName?: string;
   priority?: boolean;
+  headingLevel?: "h2" | "h3";
 }) {
   const contact = useContact();
   const image = product.images.find((i) => i.isPrimary) ?? product.images[0];
@@ -86,14 +88,14 @@ export function ProductCard({
             {categoryName}
           </p>
         ) : null}
-        <h3 className="mt-1.5 font-heading text-[1.1875rem] leading-[1.15] font-medium sm:text-[1.375rem]">
+        <Heading className="mt-1.5 font-heading text-[1.1875rem] leading-[1.15] font-medium sm:text-[1.375rem]">
           <Link
             href={href}
             className="line-clamp-2 bg-linear-to-r from-current to-current bg-[length:0%_1px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 ease-silk hover:bg-[length:100%_1px] focus-visible:bg-[length:100%_1px]"
           >
             {product.name}
           </Link>
-        </h3>
+        </Heading>
         <div className="mt-auto flex items-end justify-between gap-2 pt-3">
           <div>
             <Price product={product} />
@@ -111,7 +113,7 @@ export function ProductCard({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`WhatsApp enquiry: ${product.name} (opens in a new tab)`}
-                  className="flex size-10 shrink-0 items-center justify-center rounded-full border border-foreground/10 text-whatsapp transition-colors hover:border-whatsapp hover:bg-whatsapp hover:text-white"
+                  className="flex size-10 shrink-0 items-center justify-center rounded-full border border-foreground/10 text-whatsapp transition-colors hover:border-whatsapp hover:bg-whatsapp hover:text-white dark:hover:text-ink"
                 />
               }
             >

@@ -89,7 +89,7 @@ export function CartDrawer() {
             role="status"
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2 border-b bg-olive/10 px-5 py-3 text-sm font-medium text-olive dark:text-secondary"
+            className="flex items-center gap-2 border-b bg-olive/10 px-5 py-3 text-sm font-medium text-olive"
           >
             <Check className="size-4 shrink-0" aria-hidden="true" />
             <span className="truncate">Added {justAdded.product.name}</span>

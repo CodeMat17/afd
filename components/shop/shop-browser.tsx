@@ -4,7 +4,7 @@ import { Check, Search, SlidersHorizontal, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
-import { useMemo, useRef, useState, useTransition, type ReactNode } from "react";
+import { Suspense, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
 import { ProductGrid } from "@/components/product/product-grid";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -35,13 +35,7 @@ export interface ShopChip {
 }
 type Patch = Record<string, string | null>;
 
-export function ShopBrowser({
-  products,
-  categories,
-  chips,
-  scoped = false,
-  emptyCollection,
-}: {
+interface ShopBrowserProps {
   products: Product[];
   /** Every category, used for names on cards and in search. */
   categories: NameCategory[];
@@ -51,10 +45,40 @@ export function ShopBrowser({
   scoped?: boolean;
   /** Shown instead of the grid when this collection has no products yet. */
   emptyCollection?: ReactNode;
-}) {
+}
+
+type SearchParamsLike = Pick<URLSearchParams, "get" | "toString">;
+const NO_PARAMS: SearchParamsLike = new URLSearchParams();
+
+/**
+ * Filters live in the URL, which isn't known when the page is prerendered.
+ * The fallback renders the unfiltered collection, so the static HTML already
+ * contains the real grid (fast LCP, no layout shift); once hydrated, the
+ * URL-aware version takes over with identical markup when no filters are set.
+ */
+export function ShopBrowser(props: ShopBrowserProps) {
+  return (
+    <Suspense fallback={<ShopBrowserView {...props} searchParams={NO_PARAMS} />}>
+      <ShopBrowserWithParams {...props} />
+    </Suspense>
+  );
+}
+
+function ShopBrowserWithParams(props: ShopBrowserProps) {
+  const searchParams = useSearchParams();
+  return <ShopBrowserView {...props} searchParams={searchParams} />;
+}
+
+function ShopBrowserView({
+  products,
+  categories,
+  chips,
+  scoped = false,
+  emptyCollection,
+  searchParams,
+}: ShopBrowserProps & { searchParams: SearchParamsLike }) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
   const {
     ref: sheetRef,
@@ -380,7 +404,7 @@ function FilterPanel({
                 <label
                   className={cn(
                     "group flex min-h-11 cursor-pointer items-center gap-3 rounded-lg text-sm",
-                    count === 0 && !checked && "opacity-45",
+                    count === 0 && !checked && "text-muted-foreground [&>span:first-of-type]:opacity-45",
                   )}
                 >
                   <input
@@ -418,7 +442,7 @@ function FilterPanel({
                 <label
                   className={cn(
                     "flex min-h-11 cursor-pointer items-center gap-3 text-sm",
-                    count === 0 && !checked && "opacity-45",
+                    count === 0 && !checked && "text-muted-foreground [&>span:first-of-type]:opacity-45",
                   )}
                 >
                   <input
@@ -479,6 +503,7 @@ function PagedResults({
         products={shown}
         categoryNames={categoryNames}
         priorityCount={4}
+        headingLevel="h2"
         className="lg:grid-cols-3 2xl:grid-cols-4"
       />
       {remaining > 0 ? (

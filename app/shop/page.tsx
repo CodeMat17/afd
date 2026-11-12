@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { ShopBrowser } from "@/components/shop/shop-browser";
-import { ShopFallback } from "@/components/shop/shop-fallback";
 import { PageHeader } from "@/components/ui/section";
 import { catalog, getCatalogTree } from "@/lib/repository";
 
@@ -31,16 +29,14 @@ export default async function ShopPage() {
         description="Fabrics, ready-to-wear, headwear and accessories — every piece sold individually. Browse by department, search by name, SKU or colour, and sort to suit."
         className="border-b-0"
       />
-      <Suspense fallback={<ShopFallback />}>
-        <ShopBrowser
-          products={products}
-          categories={categories.map(({ id, name }) => ({ id, name }))}
-          chips={[
-            { label: "All", href: "/shop", active: true },
-            ...departments.map((d) => ({ label: d.name, href: `/shop/${d.slug}`, active: false })),
-          ]}
-        />
-      </Suspense>
+      <ShopBrowser
+        products={products}
+        categories={categories.map(({ id, name }) => ({ id, name }))}
+        chips={[
+          { label: "All", href: "/shop", active: true },
+          ...departments.map((d) => ({ label: d.name, href: `/shop/${d.slug}`, active: false })),
+        ]}
+      />
     </>
   );
 }

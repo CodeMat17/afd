@@ -22,6 +22,12 @@ const nextConfig: NextConfig = {
       { pathname: "/logo.png", search: "" },
     ],
     qualities: [75, 90],
+    // AVIF is markedly smaller than WebP for these photos; WebP stays as fallback.
+    formats: ["image/avif", "image/webp"],
+    // Catalogue photos are ~680–1600px wide, so 2048/3840 variants only bloat
+    // every srcset (and the HTML) without ever being sharper.
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [48, 96, 128, 256, 384],
   },
   turbopack: {
     rules: {

@@ -14,7 +14,7 @@ export const mockDepartments: ProductDepartment[] = [
     slug: "fabrics",
     tagline: "Printed, woven & embellished",
     description:
-      "Ankara, Woven Kente, Isiagu, sequin prints and luxury lace — each design sold by the piece.",
+      "Ankara, Woven Kente, Isiagu, sequin prints and luxury lace.",
     imageUrl: "/images/ankara/1000259131-680x920.jpg",
     sortOrder: 1,
   },

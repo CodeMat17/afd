@@ -171,7 +171,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
 
 function Availability({ available }: { available: boolean }) {
   return available ? (
-    <p className="inline-flex h-8 items-center gap-1.5 rounded-full bg-olive/10 px-3 text-xs font-semibold tracking-wide text-olive dark:bg-secondary/15 dark:text-secondary">
+    <p className="inline-flex h-8 items-center gap-1.5 rounded-full bg-olive/10 px-3 text-xs font-semibold tracking-wide text-olive dark:bg-secondary/15">
       <Check className="size-3.5" aria-hidden="true" />
       Available
     </p>

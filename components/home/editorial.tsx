@@ -10,7 +10,7 @@ import { Container } from "@/components/ui/section";
 const pillars = [
   {
     title: "Fabrics",
-    body: "Printed Ankara and sequin Ankara, woven Kente, plush Isiagu and stone-set lace — by the piece.",
+    body: "Printed Ankara and sequin Ankara, woven Kente, plush Isiagu and stone-set lace.",
   },
   {
     title: "Clothing",

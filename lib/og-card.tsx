@@ -3,15 +3,15 @@ import "server-only";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
-import { site } from "@/lib/site";
+import { ogDefaultImage, site } from "@/lib/site";
 
 /**
- * Shared 1200×630 share card used by every `opengraph-image.tsx`: brand panel
+ * Shared 1200×630 share card used by the dynamic `opengraph-image.tsx` routes: brand panel
  * on the left, one or two photos on the right.
  */
 
 export const ogSize = { width: 1200, height: 630 };
-export const ogContentType = "image/png";
+export const ogContentType = "image/jpeg";
 
 const PHOTO_PANEL_WIDTH = 532;
 
@@ -59,7 +59,43 @@ function titleSize(title: string): number {
   return 52;
 }
 
-export async function renderOgCard({ eyebrow, title, subtitle, photos }: OgCardProps) {
+/**
+ * Renders the card and re-encodes it as JPEG. ImageResponse only emits PNG,
+ * which for photo cards is ~1 MB — too big for WhatsApp's link preview. If
+ * anything fails, the error is logged and crawlers are redirected to the
+ * static default card so a share never ends up without an image.
+ */
+export async function renderOgCard(props: OgCardProps): Promise<Response> {
+  let png: Buffer;
+  try {
+    png = Buffer.from(await (await drawOgCard(props)).arrayBuffer());
+  } catch (error) {
+    console.error("[og-card] render failed, serving default image:", error);
+    return new Response(null, {
+      status: 307,
+      headers: {
+        Location: new URL(ogDefaultImage.url, site.url).toString(),
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  const cacheControl = "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800";
+  try {
+    const { default: sharp } = await import("sharp");
+    const jpeg = await sharp(png).jpeg({ quality: 82, mozjpeg: true }).toBuffer();
+    return new Response(new Uint8Array(jpeg), {
+      headers: { "Content-Type": "image/jpeg", "Cache-Control": cacheControl },
+    });
+  } catch (error) {
+    console.error("[og-card] JPEG encode failed, serving PNG:", error);
+    return new Response(new Uint8Array(png), {
+      headers: { "Content-Type": "image/png", "Cache-Control": cacheControl },
+    });
+  }
+}
+
+async function drawOgCard({ eyebrow, title, subtitle, photos }: OgCardProps) {
   const shown = photos.slice(0, 2);
   const photoWidth = Math.round(PHOTO_PANEL_WIDTH / Math.max(shown.length, 1));
 

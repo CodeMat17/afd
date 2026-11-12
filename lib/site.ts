@@ -27,6 +27,18 @@ export const site = {
 } as const;
 
 /**
+ * Default share card, pre-rendered from lib/og-card.tsx into /public (static,
+ * so it can't fail at request time). Also the fallback for dynamic cards.
+ * Regenerate it if the home card design changes.
+ */
+export const ogDefaultImage = {
+  url: "/og-default.jpg",
+  width: 1200,
+  height: 630,
+  alt: `${site.name} — African fabrics, clothing & accessories from Nairobi`,
+};
+
+/**
  * Factual announcement. Set to `null` to hide the strip. Never advertise
  * discounts, free shipping or delivery promises that are not confirmed.
  */

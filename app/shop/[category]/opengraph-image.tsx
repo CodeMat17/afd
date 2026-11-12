@@ -4,7 +4,7 @@ import { site } from "@/lib/site";
 
 export const alt = `A collection from ${site.name}`;
 export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+export const contentType = "image/jpeg";
 
 const FALLBACK_PHOTO = "/images/wooven-kente/1000294627-680x920.jpg";
 

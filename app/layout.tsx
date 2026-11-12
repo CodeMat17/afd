@@ -12,7 +12,7 @@ import { SearchDialog } from "@/components/search/search-dialog";
 import { flattenCategories } from "@/lib/catalog-tree";
 import { getContactDetails } from "@/lib/contact-server";
 import { catalog, getCatalogTree } from "@/lib/repository";
-import { site } from "@/lib/site";
+import { ogDefaultImage, site } from "@/lib/site";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -41,9 +41,10 @@ export const metadata: Metadata = {
     type: "website",
     siteName: site.name,
     locale: "en_KE",
-    // Default image comes from app/opengraph-image.tsx.
+    // Static file (not a rendered route) so the default preview can't fail.
+    images: [ogDefaultImage],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: { card: "summary_large_image", images: [ogDefaultImage] },
 };
 
 export const viewport: Viewport = {

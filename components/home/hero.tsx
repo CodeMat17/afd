@@ -54,7 +54,7 @@ export function Hero({
 
   const facts = [
     { value: "Fine fabrics", label: "Ankara to luxury lace" },
-    { value: "Head to toe", label: "Gele, turbans, ipele & beads" },
+    { value: "Head to toe", label: "Gele, turbans, beads, etc" },
     { value: site.address.city, label: "Showroom & online" },
   ];
 

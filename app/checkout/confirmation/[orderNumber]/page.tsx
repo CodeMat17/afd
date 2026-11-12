@@ -1,4 +1,4 @@
-import { Check, Clock, X } from "lucide-react";
+import { Check, Clock, User, X } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { ClearCart } from "@/components/checkout/clear-cart";
 import { buttonVariants } from "@/components/ui/button";
 import { Container } from "@/components/ui/section";
+import { getCustomer } from "@/lib/auth-server";
 import { getOrder, syncPaymentStatus } from "@/lib/checkout/payment";
 import { formatRate } from "@/lib/checkout/pricing";
 import { formatCents } from "@/lib/money";
@@ -82,6 +83,9 @@ async function Confirmation({ params, searchParams }: PageProps<"/checkout/confi
 
   const state = STATE[order.status];
   const Icon = state.icon;
+  const customer = await getCustomer().catch(() => null);
+  // Account order lists match on the lowercased email (see convex/orders.ts `mine`).
+  const inAccount = customer?.email.trim().toLowerCase() === order.email.trim().toLowerCase();
 
   return (
     <>
@@ -144,6 +148,43 @@ async function Confirmation({ params, searchParams }: PageProps<"/checkout/confi
         </p>
       </section>
 
+      {order.status === "failed" ? null : inAccount ? (
+        <Link
+          href={`/account/orders/${encodeURIComponent(order.orderNumber)}`}
+          className="mt-8 flex items-center gap-4 rounded-2xl border p-5 transition-colors hover:bg-muted"
+        >
+          <User className="size-5 shrink-0 text-primary" aria-hidden="true" />
+          <div>
+            <p className="font-semibold">Saved to your account</p>
+            <p className="text-sm text-muted-foreground">Track this order anytime from your account.</p>
+          </div>
+        </Link>
+      ) : customer ? null : (
+        <section aria-labelledby="account-prompt" className="mt-8 rounded-2xl border border-gold/40 bg-gold/10 p-6">
+          <h2 id="account-prompt" className="flex items-center gap-2 font-semibold">
+            <User className="size-4" aria-hidden="true" /> Track this order anytime
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Create an account with <span className="font-semibold text-foreground">{order.email}</span> to see this
+            order and future ones in one place. Any orders you&apos;ve already placed with that email will be there too.
+          </p>
+          <div className="mt-4 flex flex-wrap items-center gap-4">
+            <Link
+              href={accountLink("sign-up", order)}
+              className={buttonVariants()}
+            >
+              Create an account
+            </Link>
+            <Link
+              href={accountLink("sign-in", order)}
+              className="text-sm font-semibold underline underline-offset-4"
+            >
+              I already have one
+            </Link>
+          </div>
+        </section>
+      )}
+
       <div className="mt-10 flex flex-wrap justify-center gap-3">
         {order.status === "failed" ? (
           <Link href="/checkout" className={buttonVariants({ size: "lg" })}>
@@ -169,4 +210,13 @@ function Row({ label, value }: { label: string; value: string }) {
       <dd className="tabular-nums">{value}</dd>
     </div>
   );
+}
+
+/** Sign-in/up link that pre-fills the order's email and lands on the order afterwards. */
+function accountLink(page: "sign-in" | "sign-up", order: { email: string; orderNumber: string }) {
+  const params = new URLSearchParams({
+    email: order.email,
+    next: `/account/orders/${encodeURIComponent(order.orderNumber)}`,
+  });
+  return `/account/${page}?${params}`;
 }

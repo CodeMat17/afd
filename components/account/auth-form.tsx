@@ -3,7 +3,7 @@
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { FormAlert } from "@/components/forms/form-alert";
 import { TextField, focusFirstInvalid } from "@/components/forms/field";
 import { Button } from "@/components/ui/button";
@@ -48,12 +48,32 @@ const success: Record<Exclude<Mode, "sign-in">, { title: string; body: string }>
   },
 };
 
+/**
+ * Where to go after signing in, from `?next=` (e.g. back to checkout).
+ * Only same-site paths are honoured, so the link can't bounce shoppers elsewhere.
+ */
+function returnPath(): string | null {
+  const next = new URLSearchParams(window.location.search).get("next");
+  if (!next || !next.startsWith("/") || next.startsWith("//") || next.includes("\\")) return null;
+  return next;
+}
+
 export function AuthForm({ mode }: { mode: Mode }) {
   const router = useRouter();
   const [errors, setErrors] = useState<FieldErrors>({});
   const [pending, setPending] = useState(false);
   const [result, setResult] = useState<ServiceResult | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Links such as the order confirmation's "create an account" pass ?email=
+  // so the shopper signs up with the address their orders are filed under.
+  useEffect(() => {
+    if (mode !== "sign-up" && mode !== "sign-in") return;
+    const email = new URLSearchParams(window.location.search).get("email");
+    const input = formRef.current?.elements.namedItem("email");
+    if (email && input instanceof HTMLInputElement && !input.value) input.value = email;
+  }, [mode]);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -70,7 +90,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
       outcome = await authService.signIn(parsed.data);
       if (outcome.ok) {
         // Refresh so server-rendered parts of the page see the new session.
-        router.replace("/account");
+        router.replace(returnPath() ?? "/account");
         router.refresh();
         return;
       }
@@ -79,7 +99,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
       if (!parsed.success) return fail(form, toFieldErrors(parsed.error));
       setErrors({});
       setPending(true);
-      outcome = await authService.signUp(parsed.data);
+      outcome = await authService.signUp({ ...parsed.data, callbackURL: returnPath() ?? undefined });
     } else if (mode === "reset-password") {
       const parsed = resetPasswordSchema.safeParse(values);
       if (!parsed.success) return fail(form, toFieldErrors(parsed.error));
@@ -103,7 +123,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
       outcome =
         mode === "forgot-password"
           ? await authService.requestPasswordReset(parsed.data)
-          : await authService.resendVerification(parsed.data);
+          : await authService.resendVerification({ ...parsed.data, callbackURL: returnPath() ?? undefined });
     }
     setPending(false);
     setResult(outcome);
@@ -131,7 +151,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
   const asksToConfirm = mode === "sign-up" || mode === "reset-password";
 
   return (
-    <form noValidate onSubmit={onSubmit} className="space-y-5">
+    <form ref={formRef} noValidate onSubmit={onSubmit} className="space-y-5">
       {mode === "sign-up" ? (
         <TextField id="fullName" label="Full name" autoComplete="name" error={errors.fullName} />
       ) : null}

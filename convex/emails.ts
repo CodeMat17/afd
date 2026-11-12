@@ -19,12 +19,13 @@ export const sendOrderConfirmation = internalAction({
     const { order, replyTo } = data;
     const siteUrl = process.env.SITE_URL ?? site.url;
     const orderUrl = `${siteUrl}/checkout/confirmation/${encodeURIComponent(order.orderNumber)}`;
+    const signUpUrl = `${siteUrl}/account/sign-up?email=${encodeURIComponent(order.email)}`;
 
     await sendEmail({
       to: order.email,
       subject: `Order ${order.orderNumber} confirmed`,
-      html: orderHtml(order, orderUrl),
-      text: orderText(order, orderUrl),
+      html: orderHtml(order, orderUrl, signUpUrl),
+      text: orderText(order, orderUrl, signUpUrl),
       replyTo,
       logNote: `Order ${order.orderNumber} would have been confirmed by email.`,
     });
@@ -73,7 +74,7 @@ function totals(order: Doc<"orders">): [string, string][] {
   ];
 }
 
-function orderHtml(order: Doc<"orders">, orderUrl: string): string {
+function orderHtml(order: Doc<"orders">, orderUrl: string, signUpUrl: string): string {
   const cell = "padding:10px 0;border-bottom:1px solid #e7e5e4;font-size:14px;vertical-align:top";
   const items = order.items
     .map(
@@ -105,10 +106,11 @@ function orderHtml(order: Doc<"orders">, orderUrl: string): string {
     </table>
     <p style="margin:24px 0;font-size:14px;line-height:1.6">${escapeHtml(fulfilmentLine(order))}</p>
     ${emailButton("View your order", orderUrl)}
+    <p style="margin:24px 0 0;font-size:14px;line-height:1.6">Want to track this and future orders in one place? <a href="${escapeHtml(signUpUrl)}" style="color:inherit;font-weight:bold">Create an account</a> with ${escapeHtml(order.email)}. Any orders you've already placed with that email will be there too. Already have an account? Just sign in.</p>
     <p style="margin:24px 0 0;font-size:12px;line-height:1.6;color:#78716c">Questions about your order? Just reply to this email.</p>`);
 }
 
-function orderText(order: Doc<"orders">, orderUrl: string): string {
+function orderText(order: Doc<"orders">, orderUrl: string, signUpUrl: string): string {
   return [
     `Thank you, ${order.fullName}.`,
     `We've received your payment. Your order ${order.orderNumber} is confirmed.`,
@@ -121,5 +123,7 @@ function orderText(order: Doc<"orders">, orderUrl: string): string {
     fulfilmentLine(order),
     "",
     `View your order: ${orderUrl}`,
+    "",
+    `Track this and future orders in one place: create an account with ${order.email} at ${signUpUrl}`,
   ].join("\n");
 }

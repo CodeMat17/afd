@@ -27,9 +27,10 @@ const settle = <T>(result: T) =>
 
 export interface AuthService {
   signIn(input: { email: string; password: string }): Promise<ServiceResult>;
-  signUp(input: { fullName: string; email: string; password: string }): Promise<ServiceResult>;
+  /** `callbackURL` is where the email confirmation link lands (signed in). Defaults to /account. */
+  signUp(input: { fullName: string; email: string; password: string; callbackURL?: string }): Promise<ServiceResult>;
   requestPasswordReset(input: { email: string }): Promise<ServiceResult>;
-  resendVerification(input: { email: string }): Promise<ServiceResult>;
+  resendVerification(input: { email: string; callbackURL?: string }): Promise<ServiceResult>;
   resetPassword(input: { token: string; password: string }): Promise<ServiceResult>;
 }
 
@@ -84,12 +85,12 @@ async function settleAuth(request: Promise<{ error: AuthError }>): Promise<Servi
 
 export const authService: AuthService = {
   signIn: ({ email, password }) => settleAuth(authClient.signIn.email({ email, password })),
-  signUp: ({ fullName, email, password }) =>
-    settleAuth(authClient.signUp.email({ name: fullName, email, password, callbackURL: "/account" })),
+  signUp: ({ fullName, email, password, callbackURL = "/account" }) =>
+    settleAuth(authClient.signUp.email({ name: fullName, email, password, callbackURL })),
   requestPasswordReset: ({ email }) =>
     settleAuth(authClient.requestPasswordReset({ email, redirectTo: "/account/reset-password" })),
-  resendVerification: ({ email }) =>
-    settleAuth(authClient.sendVerificationEmail({ email, callbackURL: "/account" })),
+  resendVerification: ({ email, callbackURL = "/account" }) =>
+    settleAuth(authClient.sendVerificationEmail({ email, callbackURL })),
   resetPassword: ({ token, password }) =>
     settleAuth(authClient.resetPassword({ token, newPassword: password })),
 };

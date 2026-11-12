@@ -58,15 +58,18 @@ export function AdminShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-dvh bg-background lg:pl-72">
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col border-r border-foreground/[0.07] bg-card lg:flex">
-        <div className="px-6 pt-7 pb-6">
+        <div className="shrink-0 px-6 pt-7 pb-6">
           <Brand />
         </div>
-        <p className="eyebrow px-6 pb-3 text-muted-foreground">Manage</p>
-        <Suspense fallback={<SideNav pathname="" />}>
-          <SideNavWithPath />
-        </Suspense>
+        <p className="eyebrow shrink-0 px-6 pb-3 text-muted-foreground">Manage</p>
+        {/* Only the nav scrolls, so the footer (and Sign out) stays visible on short screens. */}
+        <div className="min-h-0 flex-1 overflow-y-auto pb-2">
+          <Suspense fallback={<SideNav pathname="" />}>
+            <SideNavWithPath />
+          </Suspense>
+        </div>
 
-        <div className="mt-auto space-y-3 p-4">
+        <div className="shrink-0 space-y-3 border-t border-foreground/[0.07] p-4">
           <Link
             href="/"
             target="_blank"

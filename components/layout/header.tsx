@@ -88,7 +88,7 @@ function HeaderView({ departments, pathname }: { departments: NavDepartment[]; p
           <Link
             href="/account"
             aria-label="Account"
-            className="hidden size-11 items-center justify-center rounded-full transition-colors hover:bg-muted sm:flex"
+            className="flex size-11 items-center justify-center rounded-full transition-colors hover:bg-muted"
           >
             <User className="size-5" aria-hidden="true" />
           </Link>

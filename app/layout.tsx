@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     type: "website",
     siteName: site.name,
     locale: "en_KE",
-    images: [{ url: "/images/wooven-kente/1000294627-680x920.jpg", width: 680, height: 920 }],
+    // Default image comes from app/opengraph-image.tsx.
   },
   twitter: { card: "summary_large_image" },
 };

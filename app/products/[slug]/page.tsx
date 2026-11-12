@@ -11,6 +11,7 @@ import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Container, SectionHeading } from "@/components/ui/section";
 import { SIZE_LABELS, type SizeField } from "@/lib/admin/product-fields";
 import { catalog } from "@/lib/repository";
+import { site } from "@/lib/site";
 import type { Product } from "@/lib/types";
 import { unitLabel } from "@/lib/whatsapp";
 
@@ -26,15 +27,17 @@ export async function generateMetadata({
   const { slug } = await params;
   const product = await catalog.getProductBySlug(slug);
   if (!product) return { title: "Product not found" };
-  const image = product.images[0];
+  // Share image: ./opengraph-image.tsx
   return {
     title: product.name,
     description: product.description,
     alternates: { canonical: `/products/${product.slug}` },
     openGraph: {
+      type: "website",
+      siteName: site.name,
+      locale: "en_KE",
       title: product.name,
       description: product.description,
-      images: image ? [{ url: image.imageUrl, width: image.width, height: image.height, alt: image.altText }] : undefined,
     },
   };
 }

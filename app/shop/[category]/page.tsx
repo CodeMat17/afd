@@ -37,12 +37,11 @@ export async function generateMetadata({
   if (!match) return { title: "Collection not found" };
   const full = match.category ? await catalog.getCategoryBySlug(match.category.slug) : null;
   const name = match.category?.name ?? match.department.name;
-  const imageUrl = match.category?.imageUrl ?? match.department.imageUrl;
+  // Share image: ./opengraph-image.tsx
   return {
     title: match.category ? `${name} · ${match.department.name}` : name,
     description: full?.description ?? match.department.description,
     alternates: { canonical: `/shop/${slug}` },
-    openGraph: imageUrl ? { images: [{ url: imageUrl }] } : undefined,
   };
 }
 

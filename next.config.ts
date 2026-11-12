@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["*.trycloudflare.com"],
   partialPrefetching: true,
   images: {
+    // Resizing happens on Cloudinary (or not at all for /public artwork), never
+    // in this Node process: sharp's RAM and threads overload shared hosting.
+    // See lib/image-loader.ts. The settings below only shape the srcset.
+    loader: "custom",
+    loaderFile: "./lib/image-loader.ts",
     // Catalogue photos are hosted on Cloudinary; only this account's uploads are allowed.
     remotePatterns: [
       {

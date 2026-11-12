@@ -277,8 +277,12 @@ export default defineSchema({
     paidAt: v.optional(v.number()),
     /** True while this order's pieces are taken off the stock levels. */
     stockDeducted: v.optional(v.boolean()),
+    /** When the "order confirmed" email went to the customer. */
+    confirmationEmailedAt: v.optional(v.number()),
     updatedAt: v.number(),
   })
     .index("by_orderNumber", ["orderNumber"])
-    .index("by_trackingId", ["pesapalTrackingId"]),
+    .index("by_trackingId", ["pesapalTrackingId"])
+    // Customer order history (emails are stored lowercased).
+    .index("by_email", ["email"]),
 });

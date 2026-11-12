@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  // Dev only: lets a Cloudflare quick tunnel (used to test Pesapal callbacks
+  // locally) load the dev server's scripts. No effect on production builds.
+  allowedDevOrigins: ["*.trycloudflare.com"],
   partialPrefetching: true,
   images: {
     // Catalogue photos are hosted on Cloudinary; only this account's uploads are allowed.

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
+import { CheckPaymentButton } from "@/components/admin/check-payment-button";
 import { EmptyState, OrderStatusBadge, PageHeader, Panel, PanelSkeleton } from "@/components/admin/ui";
 import { buttonVariants } from "@/components/ui/button";
 import { customerWhatsappUrl, dateTime, STATUS_META, type Tone } from "@/lib/admin/orders";
@@ -97,6 +98,9 @@ async function Details({ params }: PageProps<"/admin/orders/[orderNumber]">) {
         : `Payment received. Pack the order and send it to ${order.address?.city ?? "the customer"}.`
       : meta.next;
 
+  // Paid and reversed orders are final; one that never reached Pesapal has nothing to check.
+  const canCheckPayment = (order.status === "pending" || order.status === "failed") && Boolean(order.pesapalTrackingId);
+
   const totals: [string, bigint][] = [
     ["Subtotal", BigInt(order.subtotalCents)],
     [order.fulfilment === "pickup" ? "Delivery (pickup)" : "Delivery", BigInt(order.shippingCents)],
@@ -132,9 +136,17 @@ async function Details({ params }: PageProps<"/admin/orders/[orderNumber]">) {
         <span className={cn("flex size-11 shrink-0 items-center justify-center rounded-xl", banner.iconBox)}>
           <BannerIcon className="size-5" aria-hidden="true" />
         </span>
-        <div>
+        <div className="min-w-0 flex-1">
           <p className="font-semibold">What to do next</p>
           <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">{next}</p>
+          {canCheckPayment ? (
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+              <CheckPaymentButton orderNumber={order.orderNumber} />
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                Customer says they paid? This asks Pesapal directly and updates the order.
+              </p>
+            </div>
+          ) : null}
         </div>
       </div>
 

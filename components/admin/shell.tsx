@@ -9,6 +9,7 @@ import {
   Package,
   ReceiptText,
   SlidersHorizontal,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 import Image from "next/image";
@@ -32,6 +33,7 @@ interface NavItem {
 const NAV: NavItem[] = [
   { href: "/admin", label: "Overview", short: "Home", description: "Today at a glance", icon: LayoutDashboard },
   { href: "/admin/orders", label: "Orders", short: "Orders", description: "Payments & deliveries", icon: ReceiptText },
+  { href: "/admin/customers", label: "Customers", short: "People", description: "Accounts & sign-ups", icon: Users },
   { href: "/admin/products", label: "Products", short: "Products", description: "Catalogue & stock", icon: Package },
   { href: "/admin/hero", label: "Home page hero", short: "Hero", description: "Photos at the top of the shop", icon: GalleryHorizontalEnd },
   { href: "/admin/gallery", label: "Gallery", short: "Gallery", description: "Looks on the gallery page", icon: Images },
@@ -189,7 +191,7 @@ function TabBar({ pathname }: { pathname: string }) {
       aria-label="Admin"
       className="fixed inset-x-0 bottom-0 z-40 border-t border-foreground/[0.07] bg-card/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
     >
-      <ul className="mx-auto grid max-w-lg grid-cols-6">
+      <ul className="mx-auto grid max-w-xl grid-cols-7">
         {NAV.map((item) => {
           const active = isActive(pathname, item.href);
           const Icon = item.icon;
@@ -205,7 +207,7 @@ function TabBar({ pathname }: { pathname: string }) {
               >
                 <span
                   className={cn(
-                    "flex h-8 w-12 items-center justify-center rounded-full transition-colors",
+                    "flex h-8 w-full max-w-12 items-center justify-center rounded-full transition-colors",
                     active && "bg-primary/12",
                   )}
                 >

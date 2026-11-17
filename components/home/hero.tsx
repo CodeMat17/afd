@@ -91,25 +91,27 @@ export function Hero({
             <span className="h-16 w-px bg-linear-to-t from-transparent to-gold/50" />
           </div>
 
-          <div className="max-w-xl">
+          <div className="max-w-xl lg:max-w-2xl">
             <p
               style={{ "--enter-y": "12px", animationDuration: "0.8s" } as CSSProperties}
               className="enter-fade-up flex items-center gap-3 text-[0.6875rem] font-semibold tracking-[0.32em] text-gold uppercase"
             >
               <span className="h-px w-10 bg-linear-to-r from-transparent to-gold" aria-hidden="true" />
-              {site.address.city} showroom
-              <span className="hidden size-1 rotate-45 bg-gold/70 sm:inline-block" aria-hidden="true" />
-              <span className="hidden font-medium tracking-[0.2em] text-band-muted normal-case sm:inline">{site.address.street}</span>
+              {/* {site.address.city} showroom... */}
+              Home of refined African fashion
+              {/* Street only where there's room, so the eyebrow stays on one line */}
+              <span className="hidden size-1 shrink-0 rotate-45 bg-gold/70 2xl:inline-block" aria-hidden="true" />
+              <span className="hidden font-medium tracking-[0.2em] whitespace-nowrap text-band-muted normal-case 2xl:inline">{site.address.street}</span>
             </p>
 
             <h1
               id="hero-title"
-              className="mt-[clamp(0.75rem,2svh,1.25rem)] font-heading text-[clamp(2.75rem,14vw,4rem)] leading-[0.9] font-bold tracking-[-0.03em] text-balance sm:text-8xl lg:text-[clamp(4.25rem,min(7.5vw,13svh),8rem)]"
+              className="mt-[clamp(0.75rem,2svh,1.25rem)] font-heading text-[clamp(2.75rem,14vw,4rem)] leading-[0.9] font-bold tracking-[-0.03em] text-balance sm:text-7xl lg:text-[clamp(3.25rem,min(5.75vw,10.5svh),6.75rem)]"
             >
-              <SplitText text="From the fabric" className="block" delay={0.1} />
+              <SplitText text="African fabric and" className="block" delay={0.1} />
               <span className="block">
-                <SplitText text="to the" className="font-normal text-band-foreground/75 italic" delay={0.25} />{" "}
-                <SplitText text="crown." className="text-gold italic" delay={0.4} />
+                <SplitText text="designs," className="font-normal text-band-foreground/75 italic" delay={0.25} />{" "}
+                <SplitText text="Kenya." className="text-gold italic" delay={0.4} />
               </span>
             </h1>
 
